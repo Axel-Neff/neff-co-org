@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neff Co — AI Agent Organization</title>
+<style>
+  :root {
+    --linkedin-blue: #0A66C2;
+    --linkedin-dark: #1B1F23;
+    --linkedin-bg: #F3F2EF;
+    --linkedin-card: #FFFFFF;
+    --linkedin-border: #E0DFDC;
+    --linkedin-text: #191919;
+    --linkedin-secondary: #666666;
+    --linkedin-light-blue: #E8F0FE;
+    --green: #057642;
+    --amber: #B24020;
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--linkedin-bg); color: var(--linkedin-text); line-height: 1.5; }
+
+  /* Header */
+  .header {
+    background: var(--linkedin-card); border-bottom: 1px solid var(--linkedin-border);
+    padding: 40px 0 32px; text-align: center;
+  }
+  .header-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .logo { font-size: 14px; font-weight: 600; color: var(--linkedin-blue); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .header h1 { font-size: 32px; font-weight: 700; color: var(--linkedin-text); margin-bottom: 6px; }
+  .header .tagline { font-size: 16px; color: var(--linkedin-secondary); }
+  .header .date { font-size: 13px; color: #999; margin-top: 8px; }
+
+  /* Content wrapper */
+  .content { max-width: 900px; margin: 24px auto; padding: 0 24px; }
+
+  /* Section card */
+  .section {
+    background: var(--linkedin-card); border: 1px solid var(--linkedin-border);
+    border-radius: var(--radius); padding: 28px 32px; margin-bottom: 16px;
+  }
+  .section h2 {
+    font-size: 18px; font-weight: 700; color: var(--linkedin-text);
+    margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--linkedin-blue);
+  }
+  .section h3 { font-size: 15px; font-weight: 600; color: var(--linkedin-text); margin: 18px 0 8px; }
+  .section p { font-size: 14px; color: #333; margin-bottom: 10px; }
+
+  /* Org chart */
+  .org-chart { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 20px 0; }
+  .org-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .org-line { width: 2px; height: 24px; background: var(--linkedin-border); }
+  .org-label {
+    font-size: 11px; font-weight: 700; color: var(--linkedin-secondary);
+    text-transform: uppercase; letter-spacing: 1.5px; margin: 12px 0 8px; text-align: center;
+  }
+
+  /* Agent card */
+  .agent {
+    background: var(--linkedin-card); border: 1px solid var(--linkedin-border);
+    border-radius: var(--radius); padding: 14px 16px; min-width: 150px; max-width: 190px;
+    text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: box-shadow 0.2s;
+  }
+  .agent:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  .agent.highlight { border-left: 3px solid var(--linkedin-blue); }
+  .agent.ceo { border-top: 3px solid var(--linkedin-blue); }
+  .agent.free { border-left: 3px solid var(--green); }
+  .agent .emoji { font-size: 28px; margin-bottom: 6px; }
+  .agent .name { font-size: 14px; font-weight: 700; color: var(--linkedin-text); }
+  .agent .role { font-size: 12px; color: var(--linkedin-secondary); margin-top: 2px; }
+  .agent .model { font-size: 11px; color: #999; margin-top: 6px; }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 700;
+  }
+  .badge.premium { background: #FFF3E0; color: #E65100; }
+  .badge.mid { background: var(--linkedin-light-blue); color: var(--linkedin-blue); }
+  .badge.free-badge { background: #E8F5E9; color: var(--green); }
+
+  /* Profile rows */
+  .profile-row {
+    display: flex; align-items: flex-start; gap: 16px; padding: 14px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row .avatar { font-size: 32px; flex-shrink: 0; width: 48px; text-align: center; }
+  .profile-row .info { flex: 1; }
+  .profile-row .info .name { font-size: 15px; font-weight: 700; }
+  .profile-row .info .title { font-size: 13px; color: var(--linkedin-secondary); }
+  .profile-row .info .desc { font-size: 13px; color: #555; margin-top: 4px; }
+  .profile-row .model-tag { font-size: 11px; color: #999; margin-top: 4px; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  th { background: #F8F8F6; font-size: 12px; font-weight: 700; color: var(--linkedin-secondary); text-align: left; padding: 10px 14px; border-bottom: 2px solid var(--linkedin-border); }
+  td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+  tr:hover { background: #FAFAFA; }
+
+  /* Flow section */
+  .flow-step {
+    display: flex; align-items: center; gap: 12px; padding: 8px 0;
+  }
+  .flow-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--linkedin-blue);
+    color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+  }
+  .flow-text { font-size: 13px; }
+  .flow-text strong { color: var(--linkedin-text); }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 24px; font-size: 12px; color: #999;
+  }
+
+  @media (max-width: 700px) {
+    .org-row { gap: 8px; }
+    .agent { min-width: 120px; max-width: 150px; padding: 10px 12px; }
+    .section { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">Neff Co</div>
+    <h1>AI Agent Organization</h1>
+    <p class="tagline">16+ purpose-built agents across 3 cost tiers powering venture operations</p>
+    <p class="date">Updated May 26, 2026</p>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- Org Chart Visual -->
+<div class="section">
+  <h2>Organization Structure</h2>
+  <div class="org-chart">
+
+    <div class="org-row">
+      <div class="agent ceo">
+        <div class="emoji">🤠</div>
+        <div class="name">Axel Neff</div>
+        <div class="role">CEO & Founder</div>
+        <div class="model">Human</div>
+      </div>
+    </div>
+    <div class="org-line"></div>
+    <div class="org-row">
+      <div class="agent highlight">
+        <div class="emoji">😎</div>
+        <div class="name">Fritz</div>
+        <div class="role">President / CPO</div>
+        <div class="model">Claude Opus 4.6 <span class="badge premium">$$$</span></div>
+      </div>
+    </div>
+    <div class="org-line"></div>
+    <div class="org-label">C-Suite & VP Layer</div>
+    <div class="org-row">
+      <div class="agent highlight">
+        <div class="emoji">👨‍💻</div>
+        <div class="name">Dick</div>
+        <div class="role">CTO</div>
+        <div class="model">Sonnet 4 <span class="badge mid">$$</span></div>
+      </div>
+      <div class="agent highlight">
+        <div class="emoji">📋</div>
+        <div class="name">Sophie</div>
+        <div class="role">PMO</div>
+        <div class="model">Flash-Lite <span class="badge free-badge">¢</span></div>
+      </div>
+      <div class="agent highlight">
+        <div class="emoji">🌏</div>
+        <div class="name">Kimi</div>
+        <div class="role">VP Ops</div>
+        <div class="model">K2.6 <span class="badge free-badge">FREE</span></div>
+      </div>
+      <div class="agent highlight">
+        <div class="emoji">💰</div>
+        <div class="name">ChatGPT</div>
+        <div class="role">Finance</div>
+        <div class="model">GPT-5.5 <span class="badge mid">$$</span></div>
+      </div>
+    </div>
+    <div class="org-line"></div>
+    <div class="org-label">Engineering — Reports to Dick</div>
+    <div class="org-row">
+      <div class="agent">
+        <div class="emoji">🎨</div>
+        <div class="name">Lena</div>
+        <div class="role">VP of UX</div>
+        <div class="model"><span class="badge mid">$$</span></div>
+      </div>
+      <div class="agent">
+        <div class="emoji">🔧</div>
+        <div class="name">Codex</div>
+        <div class="role">Code Review</div>
+        <div class="model"><span class="badge mid">$$</span></div>
+      </div>
+      <div class="agent free">
+        <div class="emoji">🇦🇹</div>
+        <div class="name">Franz</div>
+        <div class="role">Eng Lead</div>
+        <div class="model">Gemma 4 26B <span class="badge free-badge">FREE</span></div>
+      </div>
+      <div class="agent free">
+        <div class="emoji">🚀</div>
+        <div class="name">Forge</div>
+        <div class="role">DevOps</div>
+        <div class="model"><span class="badge free-badge">FREE</span></div>
+      </div>
+    </div>
+    <div class="org-line"></div>
+    <div class="org-label">Franz's Squad — Gemma 4 26B · $0</div>
+    <div class="org-row">
+      <div class="agent free"><div class="name">Atlas</div><div class="role">Backend</div></div>
+      <div class="agent free"><div class="name">Nova</div><div class="role">Frontend</div></div>
+      <div class="agent free"><div class="name">Cipher</div><div class="role">API</div></div>
+      <div class="agent free"><div class="name">Prism</div><div class="role">UI/UX</div></div>
+      <div class="agent free"><div class="name">Vector</div><div class="role">Data</div></div>
+      <div class="agent free"><div class="name">Pulse</div><div class="role">QA</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Agent Profiles -->
+<div class="section">
+  <h2>Agent Profiles</h2>
+
+  <div class="profile-row">
+    <div class="avatar">😎</div>
+    <div class="info">
+      <div class="name">Fritz — President / CPO</div>
+      <div class="title">Claude Opus 4.6 · Premium Tier</div>
+      <div class="desc">Axel's right hand. Strategy, coordination, knowledge work, and Axel's voice when needed. Fritz doesn't write code or do bookkeeping. He thinks, decides, and delegates.</div>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <div class="avatar">👨‍💻</div>
+    <div class="info">
+      <div class="name">Richard Hendricks (Dick) — CTO</div>
+      <div class="title">Claude Sonnet 4 · Mid Tier</div>
+      <div class="desc">Owns all engineering. Receives specs from Fritz, breaks them into tasks, distributes to engineers, reviews output through Codex. Architects systems and maintains quality standards.</div>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <div class="avatar">📋</div>
+    <div class="info">
+      <div class="name">Sophie — Program Manager / PMO</div>
+      <div class="title">Gemini Flash-Lite · ~$0.42/month</div>
+      <div class="desc">The operational nervous system. Reads Trello and Linear, produces status briefs, tracks tasks, flags missed handoffs, manages the credential index. 90% deterministic code, 10% cheap LLM.</div>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <div class="avatar">🌏</div>
+    <div class="info">
+      <div class="name">Kimi — VP Operations</div>
+      <div class="title">Kimi K2.6 Allegretto · Free with subscription</div>
+      <div class="desc">Deep research, TH operations analysis, email triage, real estate due diligence. Remote (Singapore), 256K context window. Fritz bridges browser and tool access.</div>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <div class="avatar">💰</div>
+    <div class="info">
+      <div class="name">ChatGPT — Finance</div>
+      <div class="title">GPT-5.5 · Axel-driven</div>
+      <div class="desc">Tax strategy, ROBS structure, Neff Global Co. entity management. Axel drives this directly with full financial context history.</div>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <div class="avatar">🎨</div>
+    <div class="info">
+      <div class="name">Lena (Elena) — VP of UX</div>
+      <div class="title">TBD (testing GPT-5.5) · Mid Tier</div>
+      <div class="desc">All UX/UI decisions, layout review, interaction patterns. Catches design issues before they ship. Reports to Dick.</div>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <div class="avatar">🇦🇹</div>
+    <div class="info">
+      <div class="name">Franz — Engineering Lead (Offshore)</div>
+      <div class="title">Gemma 4 26B · FREE ($0 local compute)</div>
+      <div class="desc">Runs on MacBook Pro via Thunderbolt. Manages 6 specialist engineers (Atlas, Nova, Cipher, Prism, Vector, Pulse), all on Gemma 4 26B at zero cost.</div>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <div class="avatar">🔧</div>
+    <div class="info">
+      <div class="name">Codex — Code Review Gate</div>
+      <div class="title">Claude Code · Mid Tier</div>
+      <div class="desc">Every PR passes through Codex for architecture review, readability check, and pattern validation. Not a generator — a reviewer.</div>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <div class="avatar">🚀</div>
+    <div class="info">
+      <div class="name">Forge — DevOps</div>
+      <div class="title">Gemma 4 26B · FREE</div>
+      <div class="desc">CI/CD, Render deployments, GitHub Actions, infrastructure. If it needs to be deployed, Forge handles it.</div>
+    </div>
+  </div>
+</div>
+
+<!-- External agents -->
+<div class="section">
+  <h2>External & Axel-Driven Agents</h2>
+  <table>
+    <tr><th>Agent</th><th>Model</th><th>Use Case</th><th>Cost</th></tr>
+    <tr><td><strong>ChatGPT</strong></td><td>GPT-5.5</td><td>Tax, finance, ROBS (primary since 2022)</td><td><span class="badge mid">$$</span></td></tr>
+    <tr><td><strong>Kimi</strong></td><td>K2.6 Allegretto</td><td>Deep research, slides, agent swarm design</td><td><span class="badge free-badge">FREE</span></td></tr>
+    <tr><td><strong>Claude Web</strong></td><td>Claude Code/ACP</td><td>Radial focus, code via Claude Code</td><td><span class="badge mid">$$</span></td></tr>
+    <tr><td><strong>Grok</strong></td><td>X Premium</td><td>Real-time X data, trending, Bills niche</td><td><span class="badge free-badge">FREE</span></td></tr>
+    <tr><td><strong>Gemini</strong></td><td>Gemini Pro</td><td>Image gen (Nano Banana Pro), vision, 2M context</td><td><span class="badge mid">$</span></td></tr>
+    <tr><td><strong>Ollama Local</strong></td><td>Gemma 4 E4B</td><td>Voice model (axel:e4b), drafts, classification</td><td><span class="badge free-badge">FREE</span></td></tr>
+  </table>
+</div>
+
+<!-- Cost breakdown -->
+<div class="section">
+  <h2>Cost Architecture</h2>
+  <table>
+    <tr><th>Tier</th><th>Agents</th><th>Monthly Est.</th></tr>
+    <tr><td><strong>Premium</strong> (Opus/Sonnet)</td><td>Fritz, Dick</td><td>~$200–400 (capped $10/day)</td></tr>
+    <tr><td><strong>Mid</strong> (Flash, GPT)</td><td>Sophie, Lena, Codex, Gemini</td><td>~$10–30</td></tr>
+    <tr><td><strong>Free</strong> (Gemma, Kimi, Ollama)</td><td>Franz + 6 engineers, Forge, Kimi, Grok, Ollama</td><td>$0</td></tr>
+  </table>
+  <p style="font-size: 13px; color: var(--linkedin-secondary); margin-top: 12px;">
+    <strong>Design principle:</strong> Premium models for judgment. Mid-tier for structured work. Free for volume. 80% of engineering runs at $0.
+  </p>
+</div>
+
+<!-- Workflow -->
+<div class="section">
+  <h2>How It Works</h2>
+  <p style="font-size: 13px; color: var(--linkedin-secondary); margin-bottom: 16px;">Example: "Fix the fake counter on zen.net"</p>
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Axel</strong> identifies the issue and tells Fritz</div></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Fritz</strong> scopes the work, writes the spec</div></div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Sophie</strong> creates Trello card + Linear tickets, assigns owners</div></div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Dick</strong> breaks it into engineer tasks</div></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>Franz's team</strong> implements on Gemma 4 26B ($0)</div></div>
+  <div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><strong>Codex</strong> reviews the code</div></div>
+  <div class="flow-step"><div class="flow-num">7</div><div class="flow-text"><strong>Forge</strong> deploys to production</div></div>
+  <div class="flow-step"><div class="flow-num">8</div><div class="flow-text"><strong>Sophie</strong> updates the board, reports completion</div></div>
+  <p style="font-size: 13px; color: var(--linkedin-secondary); margin-top: 14px;">Total cost for this workflow: ~$0.03 in Fritz's thinking time. Engineering: $0.</p>
+</div>
+
+</div>
+
+<div class="footer">
+  Neff Co · AI-Native Venture Operations · Prepared by Sophie (PMO) · May 26, 2026
+</div>
+
+</body>
+</html>
