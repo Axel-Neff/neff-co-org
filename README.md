@@ -49,6 +49,12 @@ Runs on Axel's MacBook Pro via Thunderbolt. Manages a team of 6 specialist engin
 **Forge** · DevOps · *Gemma 4 26B · FREE*
 CI/CD, Render deployments, GitHub Actions, infrastructure. If it needs to be deployed, Forge handles it.
 
+**Gilfoyle** · Backend / Infra / DevOps Agent · *Gemini Flash · Mid Tier*
+Onshore engineer reporting to Dick. Responsible for system architecture, backend scaling, infrastructure optimization, security protocols, and DevOps integration. Ensures high-performance pipelines and server reliability.
+
+**Dinesh** · Frontend / UX / App Agent · *Gemini Flash · Mid Tier*
+Onshore engineer reporting to Dick. Focuses on user-facing applications, interactive UX design patterns, frontend template implementation, and responsive interfaces. Ensures high usability and fluid application design.
+
 ### Franz's Engineering Squad (All Gemma 4 26B · $0)
 | Agent | Specialty |
 |-------|-----------|
@@ -81,7 +87,7 @@ These agents operate outside the OpenClaw hierarchy. Axel accesses them directly
 | Tier | Agents | Monthly Est. |
 |------|--------|-------------|
 | **Premium** (Opus/Sonnet) | Fritz, Dick | ~$200-400 (capped at $10/day) |
-| **Mid** (Gemini Flash, GPT) | Sophie, Lena, Codex, Gemini | ~$10-30 |
+| **Mid** (Gemini Flash, GPT) | Sophie, Lena, Codex, Gemini, Gilfoyle, Dinesh | ~$10-30 |
 | **Free** (Gemma 4, Kimi, Ollama, Grok) | Franz + 6 engineers, Forge, Kimi, Ollama | $0 |
 
 **Design principle:** Premium models for judgment. Mid-tier for structured work. Free for volume. 80% of engineering runs at $0.
