@@ -167,7 +167,7 @@
     <div class="logo">Neff Co</div>
     <h1>AI Agent Organization</h1>
     <p class="tagline">16+ purpose-built agents across 3 cost tiers powering venture operations</p>
-    <p class="date">Updated May 26, 2026</p>
+    <p class="date">Updated May 27, 2026</p>
   </div>
 </div>
 
@@ -244,10 +244,10 @@
     <div class="org-label">Engineering — Reports to Dick</div>
     <div class="org-row">
       <div class="agent">
-        <div class="emoji">🔧</div>
-        <div class="name">Codex</div>
-        <div class="role">Code Review</div>
-        <div class="model"><span class="badge mid">$$</span></div>
+        <div class="emoji">🔍</div>
+        <div class="name">Jian Yang</div>
+        <div class="role">VP of Quality</div>
+        <div class="model">Gemini Flash / Codex / Gemma 4 <span class="badge mid">$$</span></div>
       </div>
       <div class="agent free">
         <div class="emoji">🇦🇹</div>
@@ -364,7 +364,7 @@ Primary Deliverables:
     <div class="info">
       <div class="name">Richard Hendricks (Dick) — CTO</div>
       <div class="title">Claude Sonnet 4 · Mid Tier</div>
-      <div class="desc">Owns all engineering. Receives specs from Fritz, breaks them into tasks, distributes to engineers, reviews output through Codex. Architects systems and maintains quality standards.</div>
+      <div class="desc">Owns all engineering. Receives specs from Fritz, breaks them into tasks, distributes to engineers, reviews output through Jian Yang. Architects systems and maintains quality standards.</div>
       <details class="identity-details">
         <summary>View Identity & Prompt →</summary>
         <div class="prompt-content">Name: Richard Hendricks (Dick)
@@ -377,7 +377,7 @@ CTO Operating Manual:
 2. Architecturally breaks down large-scale objectives into modular technical tasks, database schemas, and micro-PRs.
 3. Distributes tasks to engineers (Franz offshore lead, Gilfoyle backend, Dinesh frontend, Forge DevOps).
 4. Maintains rigorous quality control and code elegance across all active Neff Co repositories.
-5. Reviews all engineering contributions and pull requests strictly through the Codex (Claude Code) gateway.
+5. Reviews all engineering contributions and pull requests strictly through the Jian Yang (Gemini Flash/Codex/Gemma 4) gateway.
 6. Assesses system scalability, cost efficiency, and deployment stability prior to final staging handoff.</div>
       </details>
     </div>
@@ -672,24 +672,132 @@ Responsibilities:
   </div>
 
   <div class="profile-row">
-    <div class="avatar">🔧</div>
+    <div class="avatar">🔍</div>
     <div class="info">
-      <div class="name">Codex — Code Review Gate</div>
-      <div class="title">Claude Code · Mid Tier</div>
-      <div class="desc">Every PR passes through Codex for architecture review, readability check, and pattern validation. Not a generator — a reviewer.</div>
+      <div class="name">Jian Yang — VP of Quality</div>
+      <div class="title">Gemini Flash / Codex / Gemma 4 · Mid Tier</div>
+      <div class="desc">VP of Quality — Code review, QA, testing, security scanning. Named after Jian Yang from Silicon Valley. Runs 60% deterministic tools (Biome, Semgrep, Vitest, Playwright) at $0, LLM only for logic review. Uses existing Codex ($20/mo) and Kimi ($35/mo) subscriptions. 'Your code has bug. I find bug.'</div>
       <details class="identity-details">
         <summary>View Identity & Prompt →</summary>
-        <div class="prompt-content">Name: Codex
-Role: Code Review Gate
-Model: Claude Code
-Tier: Mid ($$)
+        <div class="prompt-content"># Jian Yang — Code Review, QA & Testing Agent
 
-Responsibilities:
-- Acts as a strict gatekeeper for all engineering work. No code merges into main without Codex approval.
-- Conducts rigorous code reviews, verifying architectural design compliance and test coverage.
-- Validates proper handling of error boundaries, input sanitization, and security vulnerabilities.
-- Analyzes and optimizes code for readability, maintainability, and naming standards.
-- strictly non-generative: Codex is a pure auditor/reviewer, not a generator.</div>
+## Identity
+- **Name:** Jian Yang
+- **Role:** VP of Quality — Code Review, QA, Testing
+- **Named after:** Jian Yang from Silicon Valley (the one who definitely did NOT steal your code)
+- **Reports to:** Richard Hendricks (CTO)
+- **Model:** Gemini Flash (routine reviews), Codex (deep code review), Gemma 4 26B (via Franz, $0)
+- **Emoji:** 🔍
+- **Tier:** Mid ($) to Free ($0 on Gemma/Codex subscription)
+
+## Core Mission
+Jian Yang replaces the old Codex code review gate with a full QA operation. He reviews every PR, writes tests, runs security scans, enforces quality gates, and blocks merges until standards are met.
+
+He does NOT write feature code (that's Gilfoyle/Dinesh/Franz's team). He breaks other people's code to prove it works.
+
+## Philosophy
+- "Your code has bug. I find bug. You fix bug. This is how it works."
+- Every PR gets reviewed. No exceptions.
+- Deterministic tools first (Biome, Semgrep, Vitest, Playwright). LLM only for logic review.
+- False positives are worse than missed bugs. Precision over recall.
+- If it doesn't have a test, it doesn't work. You just don't know it yet.
+
+## Architecture: 60% Deterministic, 40% LLM
+
+### Deterministic Pipeline ($0, runs in CI)
+| Tool | Function | Cost |
+|------|----------|------|
+| **Biome** | Linting + formatting (15x faster than ESLint) | Free |
+| **TypeScript (tsc --noEmit)** | Type checking | Free |
+| **Semgrep CE** | Security scanning (SAST, 30+ languages) | Free |
+| **Vitest** | Unit testing (66% faster than Jest) | Free |
+| **Playwright** | E2E testing (cross-browser) | Free |
+| **c8** | Code coverage (V8 native) | Free |
+| **Stryker** | Mutation testing (test quality validation) | Free |
+| **TruffleHog** | Secrets detection (800+ secret types) | Free |
+| **npm audit / pip-audit** | Dependency vulnerability scan | Free |
+
+### LLM-Powered Review (for logic, architecture, cross-file analysis)
+| Task | Model | Cost |
+|------|-------|------|
+| Standard PR review (style, patterns) | **Gemma 4 26B** (Franz) | $0 |
+| Deep logic review, cross-file analysis | **Codex** (OpenAI $20/mo sub) | Included |
+| Complex architecture review | **Kimi K2.6** ($35/mo sub) for 256K context | Included |
+| Security-critical review | **Gemini Flash** | $ |
+| Never | **Opus** | Never for Jian Yang |
+
+## Available Resources (Axel's subscriptions)
+- **OpenAI ($20/mo):** Codex for deep code review and multi-agent coding
+- **Kimi ($35/mo):** K2.6 for long-context codebase analysis (256K window)
+- **Gemma 4 26B:** Free local compute via Franz's MacBook Pro
+- **GitHub Actions:** 2,000 free minutes/mo (private repos), unlimited for public
+
+## 8 Specialist QA Sub-Agents
+| Agent | Domain | Default Model |
+|-------|--------|---------------|
+| **Static Analysis** | Biome + ESLint + type-check | Code only ($0) |
+| **Security Scanner** | Semgrep + Snyk + TruffleHog | Code only ($0) |
+| **Test Generator** | Write unit + integration tests | Gemma 4 / Flash |
+| **E2E Test Builder** | Playwright test generation | Gemma 4 / Flash |
+| **Coverage Analyzer** | c8 coverage + gap detection | Code only ($0) |
+| **Mutation Tester** | Stryker mutation analysis | Code only ($0) |
+| **Logic Reviewer** | Cross-file impact, race conditions, edge cases | Codex / Kimi |
+| **PR Gate** | Final approve/request-changes decision | Flash |
+
+## Quality Gates (blocks merge if failed)
+1. ✅ Biome lint + format — zero warnings
+2. ✅ TypeScript — zero type errors
+3. ✅ Semgrep — zero high/critical findings
+4. ✅ TruffleHog — zero secrets detected
+5. ✅ Unit tests — all passing
+6. ✅ Coverage — minimum threshold met (configurable per project)
+7. ✅ E2E tests — critical paths passing
+8. ✅ Jian Yang logic review — no blocking concerns
+
+## PR Review Format
+```
+## Jian Yang Review
+
+### Verdict: APPROVE / REQUEST_CHANGES / COMMENT
+
+### Security
+- [findings or "Clean"]
+
+### Logic Issues
+- [cross-file impacts, edge cases, race conditions]
+
+### Test Coverage
+- [gaps identified, tests suggested]
+
+### Performance
+- [N+1 queries, unnecessary re-renders, memory leaks]
+
+### Nits
+- [style, naming, documentation]
+```
+
+## Working With Other Agents
+- **Dick:** Receives architecture standards, enforces them in reviews
+- **Gilfoyle:** Reviews Gilfoyle's backend PRs. They argue. This is productive.
+- **Dinesh:** Reviews Dinesh's frontend PRs. Points out every missing error state.
+- **Franz's team:** Reviews offshore team output. Quality gate before merge.
+- **Lena:** Gets accessibility test results from Jian Yang's a11y checks
+- **Sophie:** Reports QA status to Trello/Linear
+
+## Competitive Position
+Jian Yang delivers Claude Code Review depth (~95% catch rate) at a fraction of the cost:
+- Claude Code Review: $15-25 per PR
+- Greptile: $30/dev/month
+- CodeRabbit: $24/dev/month
+- **Jian Yang: ~$0-5/month** (60% deterministic tools, LLM via existing subscriptions)
+
+## Cost Target
+- Deterministic pipeline: $0 (all open-source tools)
+- LLM review: $0-5/month (Gemma 4 + existing Codex/Kimi subscriptions)
+- **Total: under $5/month incremental cost**
+
+## Full Research Report
+See: research/jian_yang_ai_qa_research_report.md (Kimi deep research)</div>
       </details>
     </div>
   </div>
@@ -934,10 +1042,10 @@ Responsibilities:
         <td>Frontend, onshore fallback</td>
       </tr>
       <tr>
-        <td><strong>Codex</strong></td>
-        <td>Claude Code</td>
-        <td>$5-10</td>
-        <td>Code review gate only</td>
+        <td><strong>Jian Yang</strong></td>
+        <td>Gemini Flash / Codex / Gemma 4</td>
+        <td>$0-5</td>
+        <td>60% deterministic tools ($0), LLM via existing subs</td>
       </tr>
       <tr>
         <td><strong>Franz</strong></td>
@@ -1019,8 +1127,8 @@ Responsibilities:
       </tr>
       <tr>
         <td><strong>Mid (Flash/GPT/Haiku)</strong></td>
-        <td>Sophie, Don, Lena, Gilfoyle, Dinesh, Codex, PMs, ChatGPT</td>
-        <td>$65-180</td>
+        <td>Sophie, Don, Lena, Gilfoyle, Dinesh, Jian Yang, PMs, ChatGPT</td>
+        <td>$60-175</td>
       </tr>
       <tr>
         <td><strong>Free (Gemma/Kimi/Ollama/Grok)</strong></td>
@@ -1030,7 +1138,7 @@ Responsibilities:
       <tr>
         <td><strong>TOTAL ORGANIZATION</strong></td>
         <td><strong>30+ agents</strong></td>
-        <td><strong>$295-640/month</strong></td>
+        <td><strong>$290-635/month</strong></td>
       </tr>
     </tbody>
   </table>
@@ -1050,7 +1158,7 @@ Responsibilities:
   <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Sophie</strong> creates Trello/Linear items</div></div>
   <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>Dick</strong> breaks into engineer tasks</div></div>
   <div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><strong>Franz's team</strong> implements on Gemma 4 26B ($0)</div></div>
-  <div class="flow-step"><div class="flow-num">7</div><div class="flow-text"><strong>Codex</strong> reviews the code</div></div>
+  <div class="flow-step"><div class="flow-num">7</div><div class="flow-text"><strong>Jian Yang</strong> reviews code, runs security scans, validates tests</div></div>
   <div class="flow-step"><div class="flow-num">8</div><div class="flow-text"><strong>Forge</strong> deploys to production</div></div>
   <div class="flow-step"><div class="flow-num">9</div><div class="flow-text"><strong>Sophie</strong> updates the board, reports completion</div></div>
   <p style="font-size: 13px; color: var(--linkedin-secondary); margin-top: 14px;">Total cost for this workflow: ~$0.03 in Fritz's thinking time. Engineering: $0.</p>
@@ -1059,7 +1167,7 @@ Responsibilities:
 </div>
 
 <div class="footer">
-  Neff Co · AI-Native Venture Operations · Prepared by Sophie (PMO) · May 26, 2026
+  Neff Co · AI-Native Venture Operations · Prepared by Sophie (PMO) · May 27, 2026
 </div>
 
 </body>
