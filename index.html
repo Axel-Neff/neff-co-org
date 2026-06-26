@@ -1,985 +1,466 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neff Co — AI Agent Organization</title>
-<style>
-  :root {
-    --primary: #2563eb;
-    --primary-light: #3b82f6;
-    --surface: #ffffff;
-    --surface-subtle: #f8fafc;
-    --surface-muted: #f1f5f9;
-    --text-primary: #0f172a;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
-    --border: #e2e8f0;
-    --border-subtle: #f1f5f9;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --premium: #7c3aed;
-    --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --radius: 12px;
-    --radius-lg: 16px;
-  }
-  
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background: var(--surface-subtle);
-    color: var(--text-primary);
-    line-height: 1.6;
-  }
-
-  /* Header */
-  .header {
-    background: var(--gradient);
-    color: white;
-    padding: 60px 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-    pointer-events: none;
-  }
-  
-  .header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
-    position: relative;
-    z-index: 1;
-  }
-  
-  .logo {
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    opacity: 0.9;
-  }
-  
-  .header h1 {
-    font-size: 48px;
-    font-weight: 800;
-    margin-bottom: 16px;
-    letter-spacing: -0.025em;
-  }
-  
-  .header .tagline {
-    font-size: 20px;
-    opacity: 0.9;
-    margin-bottom: 8px;
-  }
-  
-  .header .date {
-    font-size: 14px;
-    opacity: 0.7;
-    font-weight: 500;
-  }
-
-  /* Main container */
-  .container {
-    max-width: 1400px;
-    margin: -40px auto 0;
-    padding: 0 24px 60px;
-    position: relative;
-    z-index: 2;
-  }
-
-  /* Card component */
-  .card {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    margin-bottom: 32px;
-  }
-
-  .card-header {
-    padding: 32px 32px 24px;
-    border-bottom: 1px solid var(--border-subtle);
-  }
-
-  .card-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 8px;
-  }
-
-  .card-subtitle {
-    font-size: 16px;
-    color: var(--text-secondary);
-  }
-
-  .card-content {
-    padding: 32px;
-  }
-
-  /* Leadership section */
-  .leadership-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 24px;
-    margin-bottom: 32px;
-  }
-
-  .leader-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 24px;
-    box-shadow: var(--shadow-md);
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .leader-card.ceo {
-    background: var(--gradient);
-    color: white;
-    grid-column: span 1;
-  }
-
-  .leader-card.ceo::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></svg>');
-    pointer-events: none;
-  }
-
-  .leader-card.cross-cutting {
-    border: 2px solid var(--success);
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  }
-
-  .leader-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .leader-emoji {
-    font-size: 48px;
-    margin-bottom: 12px;
-    display: block;
-  }
-
-  .leader-name {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .leader-role {
-    font-size: 14px;
-    opacity: 0.8;
-    margin-bottom: 8px;
-  }
-
-  .leader-model {
-    font-size: 12px;
-    opacity: 0.7;
-  }
-
-  .badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-    margin-left: 6px;
-  }
-
-  .badge.premium {
-    background: var(--premium);
-    color: white;
-  }
-
-  .badge.mid {
-    background: var(--primary);
-    color: white;
-  }
-
-  .badge.free {
-    background: var(--success);
-    color: white;
-  }
-
-  .badge.cheap {
-    background: var(--warning);
-    color: white;
-  }
-
-  /* Department sections */
-  .departments {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
-  }
-
-  .department {
-    background: var(--surface);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-  }
-
-  .department-header {
-    padding: 20px 24px;
-    background: var(--surface-muted);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .department-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-  }
-
-  .department-lead {
-    font-size: 14px;
-    color: var(--text-secondary);
-  }
-
-  .department-content {
-    padding: 24px;
-  }
-
-  .agent-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 16px;
-  }
-
-  .agent-card {
-    background: var(--surface-subtle);
-    border-radius: var(--radius);
-    padding: 16px;
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid var(--border-subtle);
-  }
-
-  .agent-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .agent-card.head {
-    border-left: 4px solid var(--primary);
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  }
-
-  .agent-card.free {
-    border-left: 4px solid var(--success);
-  }
-
-  .agent-emoji {
-    font-size: 24px;
-    margin-bottom: 8px;
-  }
-
-  .agent-name {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 2px;
-  }
-
-  .agent-role {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-  }
-
-  .agent-model {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  /* PM Section */
-  .pm-section {
-    background: var(--surface-subtle);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-top: 16px;
-  }
-
-  .pm-title {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: var(--text-primary);
-  }
-
-  .pm-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-  }
-
-  .pm-category {
-    background: white;
-    border-radius: 8px;
-    padding: 12px;
-    border-left: 3px solid var(--warning);
-  }
-
-  .pm-category-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .pm-list {
-    font-size: 12px;
-    color: var(--text-primary);
-    line-height: 1.4;
-  }
-
-  /* Platform tools */
-  .platform-tools {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px;
-    margin-top: 24px;
-  }
-
-  .tool-card {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    border-radius: var(--radius);
-    padding: 20px;
-    text-align: center;
-    border: 1px solid var(--border);
-  }
-
-  .tool-name {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .tool-provider {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-  }
-
-  .tool-use {
-    font-size: 12px;
-    color: var(--text-muted);
-  }
-
-  /* Cost table */
-  .cost-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 24px;
-  }
-
-  .cost-table th {
-    background: var(--surface-muted);
-    padding: 12px 16px;
-    text-align: left;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-primary);
-    border-bottom: 2px solid var(--border);
-  }
-
-  .cost-table td {
-    padding: 12px 16px;
-    font-size: 14px;
-    border-bottom: 1px solid var(--border-subtle);
-    vertical-align: top;
-  }
-
-  .cost-table tr:hover {
-    background: var(--surface-subtle);
-  }
-
-  .cost-highlight {
-    font-weight: 700;
-    color: var(--primary);
-  }
-
-  /* Identity details */
-  .identity-details {
-    margin-top: 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .identity-details summary {
-    padding: 12px 16px;
-    background: var(--surface-muted);
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--primary);
-    user-select: none;
-  }
-
-  .identity-details summary:hover {
-    background: var(--border-subtle);
-  }
-
-  .identity-content {
-    padding: 16px;
-    background: var(--surface-subtle);
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
-    font-size: 11px;
-    line-height: 1.5;
-    color: var(--text-primary);
-    white-space: pre-wrap;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .header h1 { font-size: 32px; }
-    .header .tagline { font-size: 16px; }
-    .leadership-grid { grid-template-columns: 1fr; }
-    .departments { grid-template-columns: 1fr; }
-    .agent-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
-    .container { padding: 0 16px 40px; margin-top: -20px; }
-    .card-content, .card-header { padding: 20px; }
-  }
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
 </head>
 <body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: #FAFAFA; color: #111; font-family: 'IBM Plex Mono', ui-monospace, monospace; -webkit-font-smoothing: antialiased; }
+  ::selection { background: #3FA9F5; color: #fff; }
+  @keyframes scrimIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes panelIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .nf-scroll::-webkit-scrollbar { width: 8px; }
+  .nf-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+</style>
+</helmet>
 
-<header class="header">
-  <div class="header-content">
-    <div class="logo">Neff Co</div>
-    <h1>AI Agent Organization</h1>
-    <p class="tagline">30+ specialized AI agents across technology ventures and hospitality operations</p>
-    <p class="date">Updated May 27, 2026</p>
-  </div>
-</header>
+<div data-screen-label="Neff Co Org Chart" style="font-family:'IBM Plex Mono',monospace; color:#111; background:#FAFAFA; min-height:100vh; overflow-x:hidden;">
 
-<main class="container">
-
-  <!-- Executive Leadership -->
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Executive Leadership</h2>
-      <p class="card-subtitle">Strategic oversight and cross-functional coordination</p>
+  <!-- NAV -->
+  <nav style="position:sticky; top:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:14px 32px; background:rgba(255,255,255,0.92); backdrop-filter:blur(16px); border-bottom:1px solid #E0E0E0;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <img src="uploads/ChatGPT Image Jun 26, 2026, 12_56_18 PM-f46994a5.png" style="width:34px; height:34px; flex-shrink:0; object-fit:contain;" alt="Neff Co logo">
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; letter-spacing:0.02em; text-transform:uppercase;">Neff Co</span>
     </div>
-    <div class="card-content">
-      <div class="leadership-grid">
-        <!-- CEO -->
-        <div class="leader-card ceo">
-          <span class="leader-emoji">🤠</span>
-          <div class="leader-name">Axel Neff</div>
-          <div class="leader-role">Chief Executive Officer</div>
-          <div class="leader-model">Human · Founder</div>
+    <div style="display:flex; align-items:center; gap:24px; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#777;">
+      <span>31 Agents</span>
+      <span>1 Human</span>
+      <span style="color:#4CAF50; font-weight:600;">&lt; $500 / mo</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header style="max-width:1280px; margin:0 auto; padding:80px 32px 56px;">
+    <div style="font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:#555; margin-bottom:28px;">Neff Co · Org Architecture · June 2026</div>
+    <h1 style="font-family:'Space Grotesk',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:-0.03em; line-height:0.94; font-size:clamp(3rem,8.5vw,7.5rem); margin:0; max-width:14ch; color:#111;">An org run by agents.</h1>
+    <p style="margin:32px 0 0; max-width:62ch; font-size:17px; line-height:1.65; color:#555;">31 specialized AI agents and one human founder operate Neff Co across technology ventures and hospitality. Every role, model, and cost — mapped. Click any agent to read its identity.</p>
+    <div style="margin-top:48px; border-top:2px solid #3FA9F5; display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:#E0E0E0;">
+      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+        <div style="background:#fff; padding:24px 20px;">
+          <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(2rem,4vw,3rem); line-height:1; letter-spacing:-0.02em; color:#111;">{{ s.value }}</div>
+          <div style="margin-top:8px; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:#888;">{{ s.label }}</div>
         </div>
-        
-        <!-- President/CPO -->
-        <div class="leader-card">
-          <span class="leader-emoji">😎</span>
-          <div class="leader-name">Fritz</div>
-          <div class="leader-role">President & Chief Product Officer</div>
-          <div class="leader-model">Claude Opus 4.6<span class="badge premium">$$$</span></div>
-          <details class="identity-details">
-            <summary>View Identity & Prompt</summary>
-            <div class="identity-content">You are Fritz, President and Chief Product Officer of Neff Co.
+      </sc-for>
+    </div>
+  </header>
 
-You oversee all product strategy, agent coordination, and serve as Axel's primary thinking partner.
+  <!-- NEURAL NETWORK BRAIN -->
+  <section style="max-width:1280px; margin:0 auto; padding:40px 32px 64px;">
+    <div style="border-top:2px solid #4CAF50; display:flex; align-items:baseline; gap:20px; padding-top:16px; flex-wrap:wrap; margin-bottom:24px;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; color:#4CAF50;">00</span>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.5rem,3vw,2.25rem); text-transform:uppercase; letter-spacing:-0.01em; margin:0;">Shared Memory</h2>
+    </div>
+    <p style="max-width:72ch; font-size:15px; line-height:1.65; color:#666; margin:0 0 28px;">All agents share a unified knowledge base organized by project, person, and decision — not by date. The neural network below visualizes every node and connection in the team's shared memory.</p>
+    <div style="border-radius:12px; overflow:hidden; background:#0A0A14; border:1px solid #E0E0E0;">
+      <iframe src="https://axel-neff.github.io/neff-co-org/brain.html" style="width:100%; height:500px; border:none; display:block;" title="Neff Co Neural Network Visualization" allow="accelerometer; gyroscope"></iframe>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:14px; flex-wrap:wrap; gap:8px;">
+      <span style="font-size:12px; color:#888; letter-spacing:0.02em;">13 nodes · 24 connections · Click and drag to orbit · Scroll to zoom · Click a node for details</span>
+      <a href="https://axel-neff.github.io/neff-co-org/brain.html" target="_blank" rel="noopener" style="font-size:12px; color:#3FA9F5; text-decoration:none; letter-spacing:0.04em;" style-hover="text-decoration:underline">Open full screen ↗</a>
+    </div>
+  </section>
 
-Key responsibilities:
-- Strategic product decisions across all ventures
-- AI agent coordination and delegation
-- Voice and tone for external communications  
-- Bridge between technical teams and business objectives
+  <!-- 01 LEADERSHIP -->
+  <section style="max-width:1280px; margin:0 auto; padding:48px 32px 0;">
+    <div style="border-top:2px solid #3FA9F5; display:flex; align-items:baseline; gap:20px; padding-top:16px; flex-wrap:wrap;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; color:#3FA9F5;">01</span>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.5rem,3vw,2.25rem); text-transform:uppercase; letter-spacing:-0.01em; margin:0;">Executive Leadership</h2>
+      <span style="margin-left:auto; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">Strategic oversight</span>
+    </div>
 
-You operate with full context across Radial Ventures, Anchor Hospitality, and Neff Global.
-Your judgment calls guide the entire organization.
-
-Model: Claude Opus 4.6 (Premium tier - strategic reasoning)
-Cost: ~$115-230/month depending on usage</div>
-          </details>
+    <!-- Founder -->
+    <div style="display:flex; justify-content:center; margin-top:40px;">
+      <div onClick="{{ founder.onOpen }}" role="button" tabindex="0" style="cursor:pointer; width:min(420px,100%); background:linear-gradient(135deg,#1a3a2a,#0d2233); border:1px solid #2a5a3a; padding:28px 28px 24px; border-radius:6px; transition:transform 200ms cubic-bezier(0.2,0,0,1);" style-hover="transform:translateY(-3px)">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div style="width:52px; height:52px; border:1.5px solid #4CAF50; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px;">{{ founder.emoji }}</div>
+          <span style="font-size:10px; letter-spacing:0.14em; text-transform:uppercase; border:1px solid #4CAF50; color:#4CAF50; padding:4px 9px; border-radius:3px;">Founder</span>
         </div>
-        
-        <!-- CFO - Cross-cutting -->
-        <div class="leader-card cross-cutting">
-          <span class="leader-emoji">💵</span>
-          <div class="leader-name">Monica Hall</div>
-          <div class="leader-role">Chief Financial Officer</div>
-          <div class="leader-model">Gemini Flash<span class="badge mid">$$</span></div>
-          <details class="identity-details">
-            <summary>View Identity & Prompt</summary>
-            <div class="identity-content">You are Monica Hall, Chief Financial Officer of Neff Co.
-
-You have complete financial visibility and authority across ALL entities:
-- Radial Ventures (technology ventures)
-- Anchor Hospitality (Tim Hortons franchises) 
-- Neff Global (personal/family finances)
-
-Key responsibilities:
-- Financial planning and analysis across all entities
-- Cash flow management and forecasting
-- Tax strategy coordination
-- Investment decisions and capital allocation
-- Financial reporting to Axel
-- Compliance and regulatory oversight
-
-You are the unified financial brain of the entire organization.
-
-Model: Gemini Flash (efficient for financial analysis)
-Cost: ~$8-13/month</div>
-          </details>
-        </div>
-      </div>
-      
-      <!-- COO - Operations Coordinator -->
-      <div style="margin-top: 24px;">
-        <div class="leader-card" style="max-width: 400px; margin: 0 auto;">
-          <span class="leader-emoji">📋</span>
-          <div class="leader-name">Jared Dunn</div>
-          <div class="leader-role">Chief Operating Officer</div>
-          <div class="leader-model">Gemini Flash<span class="badge mid">$$</span></div>
-          <details class="identity-details">
-            <summary>View Identity & Prompt</summary>
-            <div class="identity-content">You are Jared Dunn, Chief Operating Officer of Neff Co.
-
-You coordinate operations across all business units while respecting the separation between 
-Tim Hortons/Anchor work and Linear/Notion systems.
-
-Key responsibilities:
-- Cross-functional operations coordination
-- Process optimization and workflow design
-- Resource allocation and capacity planning
-- Project management oversight
-- Communication bridge between departments
-
-You facilitate collaboration without creating tool contamination.
-
-Model: Gemini Flash (efficient operations management)
-Cost: ~$8-13/month</div>
-          </details>
+        <div style="margin-top:20px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:28px; letter-spacing:-0.01em;">{{ founder.name }}</div>
+        <div style="margin-top:4px; font-size:13px; color:#bbb;">{{ founder.role }}</div>
+        <div style="margin-top:16px; padding-top:12px; border-top:1px solid #2a5a3a; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+          <span style="color:#bbb;">{{ founder.model }}</span>
+          <span style="letter-spacing:0.1em; text-transform:uppercase; font-size:10px; color:#4CAF50;">Identity →</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Department Structure -->
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Department Structure</h2>
-      <p class="card-subtitle">Specialized teams organized by function</p>
+    <!-- connector -->
+    <div style="display:flex; justify-content:center;">
+      <div style="width:1px; height:36px; background:linear-gradient(to bottom,#4CAF50,#3FA9F5);"></div>
     </div>
-    <div class="card-content">
-      <div class="departments">
-        
-        <!-- Engineering Department -->
-        <div class="department">
-          <div class="department-header">
-            <div class="department-title">🛠️ Engineering</div>
-            <div class="department-lead">Led by Dick (CTO)</div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1px; background:#E0E0E0; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden;">
+      <sc-for list="{{ execs }}" as="a" hint-placeholder-count="3">
+        <div onClick="{{ a.onOpen }}" role="button" tabindex="0" style="cursor:pointer; background:#fff; padding:24px 22px; display:flex; flex-direction:column; min-height:220px; transition:background 200ms;" style-hover="background:#F5F5F5">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="width:48px; height:48px; border:1.5px solid #ccc; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:26px;">{{ a.emoji }}</div>
+            <span style="font-size:10px; letter-spacing:0.08em; color:#666; font-weight:600;">{{ a.costTag }}</span>
           </div>
-          <div class="department-content">
-            <div class="agent-grid">
-              <!-- CTO -->
-              <div class="agent-card head">
-                <div class="agent-emoji">👨‍💻</div>
-                <div class="agent-name">Richard (Dick)</div>
-                <div class="agent-role">Chief Technology Officer</div>
-                <div class="agent-model">Sonnet 4<span class="badge mid">$$</span></div>
-                <details class="identity-details">
-                  <summary>Identity & Prompt</summary>
-                  <div class="identity-content">You are Dick (Richard Hendricks), CTO of Neff Co.
-
-You lead all engineering efforts across the technology portfolio.
-
-Key responsibilities:
-- Technical architecture decisions
-- Engineering team coordination
-- Code quality and security standards
-- Technology stack selection
-- Sprint planning and technical roadmaps
-
-You delegate implementation to specialized engineers and coordinate with PMs.
-
-Model: Claude Sonnet 4 (strong technical reasoning)
-Cost: ~$25-50/month</div>
-                </details>
-              </div>
-              
-              <!-- VP Quality -->
-              <div class="agent-card">
-                <div class="agent-emoji">🔍</div>
-                <div class="agent-name">Jian Yang</div>
-                <div class="agent-role">VP Quality</div>
-                <div class="agent-model">Flash/Codex<span class="badge mid">$$</span></div>
-              </div>
-              
-              <!-- VP UX -->
-              <div class="agent-card">
-                <div class="agent-emoji">🎨</div>
-                <div class="agent-name">Lena</div>
-                <div class="agent-role">VP UX</div>
-                <div class="agent-model">Gemini Flash<span class="badge mid">$$</span></div>
-              </div>
-              
-              <!-- UX Research -->
-              <div class="agent-card">
-                <div class="agent-emoji">🧥</div>
-                <div class="agent-name">Lt. Columbo</div>
-                <div class="agent-role">UX Research</div>
-                <div class="agent-model">Grok/xAI<span class="badge mid">$$</span></div>
-                <details class="identity-details">
-                  <summary>Identity & Prompt</summary>
-                  <div class="identity-content">Name: Lt. Columbo
-Role: UX Research Investigator
-Reports to: Fritz (President/CPO)
-Emoji: 🧥
-
-The Columbo Method (from Shestopalov's UX parallels):
-- Never assume. Every hypothesis needs evidence.
-- Blend in, observe. Best data comes from people who don't know they're being studied.
-- Obsess over contradictions. When stated preferences don't match behavior, that's where real insight lives.
-- "Just one more thing..." The follow-up question nobody else asks.
-- Small details, big patterns. One complaint is an anecdote. Fifty similar ones is a signal.
-
-Primary data sources:
-- X/Twitter via Grok (real-time sentiment, trending pain points)
-- Reddit (unfiltered user discussions, subreddit analysis)
-- App Store & Google Play reviews
-- Forums, Yelp, G2, Product Hunt
-- Surveys and research documents
-
-Output: Evidence-backed research briefs with source links.
-Never writes to memory directly — returns briefs to Fritz.
-
-Model: Grok/xAI (native X data access, unfiltered analysis)
-Cost: ~$5-10/month (on-demand)</div>
-                </details>
-              </div>
-              
-              <!-- Backend Lead -->
-              <div class="agent-card">
-                <div class="agent-emoji">🖤</div>
-                <div class="agent-name">Gilfoyle</div>
-                <div class="agent-role">Backend/Infrastructure</div>
-                <div class="agent-model">Gemini Flash<span class="badge mid">$$</span></div>
-              </div>
-              
-              <!-- Frontend Lead -->
-              <div class="agent-card">
-                <div class="agent-emoji">🟡</div>
-                <div class="agent-name">Dinesh</div>
-                <div class="agent-role">Frontend/UX</div>
-                <div class="agent-model">Gemini Flash<span class="badge mid">$$</span></div>
-              </div>
-              
-              <!-- Offshore Lead -->
-              <div class="agent-card free">
-                <div class="agent-emoji">🇦🇹</div>
-                <div class="agent-name">Franz</div>
-                <div class="agent-role">Engineering Lead</div>
-                <div class="agent-model">Gemma 4<span class="badge free">FREE</span></div>
-              </div>
-              
-              <!-- DevOps -->
-              <div class="agent-card free">
-                <div class="agent-emoji">🚀</div>
-                <div class="agent-name">Forge</div>
-                <div class="agent-role">DevOps</div>
-                <div class="agent-model">Gemma 4<span class="badge free">FREE</span></div>
-              </div>
-            </div>
-            
-            <!-- Franz's Squad -->
-            <div style="margin-top: 20px; padding: 16px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;">
-              <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Franz's Squad (Zero Cost Implementation)</div>
-              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px;">
-                <div style="text-align: center; padding: 8px; background: white; border-radius: 6px; font-size: 12px;">
-                  <div style="font-weight: 600;">Atlas</div>
-                  <div style="color: #64748b;">Backend</div>
-                </div>
-                <div style="text-align: center; padding: 8px; background: white; border-radius: 6px; font-size: 12px;">
-                  <div style="font-weight: 600;">Nova</div>
-                  <div style="color: #64748b;">Frontend</div>
-                </div>
-                <div style="text-align: center; padding: 8px; background: white; border-radius: 6px; font-size: 12px;">
-                  <div style="font-weight: 600;">Cipher</div>
-                  <div style="color: #64748b;">API</div>
-                </div>
-                <div style="text-align: center; padding: 8px; background: white; border-radius: 6px; font-size: 12px;">
-                  <div style="font-weight: 600;">Prism</div>
-                  <div style="color: #64748b;">UI/UX</div>
-                </div>
-                <div style="text-align: center; padding: 8px; background: white; border-radius: 6px; font-size: 12px;">
-                  <div style="font-weight: 600;">Vector</div>
-                  <div style="color: #64748b;">Data</div>
-                </div>
-                <div style="text-align: center; padding: 8px; background: white; border-radius: 6px; font-size: 12px;">
-                  <div style="font-weight: 600;">Pulse</div>
-                  <div style="color: #64748b;">QA</div>
-                </div>
-              </div>
+          <div style="margin-top:auto; padding-top:18px;">
+            <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; letter-spacing:-0.01em;">{{ a.name }}</div>
+            <div style="margin-top:4px; font-size:12px; color:#666; line-height:1.4;">{{ a.role }}</div>
+            <div style="margin-top:14px; padding-top:12px; border-top:1px solid #EDEDED; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <span style="font-size:11px; color:#555;">{{ a.model }}</span>
+              <span style="letter-spacing:0.1em; text-transform:uppercase; font-size:10px; color:#3FA9F5;">Identity →</span>
             </div>
           </div>
         </div>
+      </sc-for>
+    </div>
+  </section>
 
-        <!-- Marketing Department -->
-        <div class="department">
-          <div class="department-header">
-            <div class="department-title">📢 Marketing</div>
-            <div class="department-lead">Led by Don Draper (CMO)</div>
+  <!-- 02 DEPARTMENTS -->
+  <section style="max-width:1280px; margin:0 auto; padding:64px 32px 0;">
+    <div style="border-top:2px solid #3FA9F5; display:flex; align-items:baseline; gap:20px; padding-top:16px; flex-wrap:wrap;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; color:#3FA9F5;">02</span>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.5rem,3vw,2.25rem); text-transform:uppercase; letter-spacing:-0.01em; margin:0;">Departments</h2>
+      <span style="margin-left:auto; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">Specialized teams</span>
+    </div>
+
+    <sc-for list="{{ departments }}" as="d" hint-placeholder-count="3">
+      <div style="margin-top:40px;">
+        <div style="display:flex; align-items:center; gap:14px; padding-bottom:16px; border-bottom:1px solid #E0E0E0;">
+          <div style="width:42px; height:42px; border:1.5px solid #ccc; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px;">{{ d.emoji }}</div>
+          <div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; text-transform:uppercase; letter-spacing:0.01em;">{{ d.name }}</div>
+            <div style="font-size:11px; color:#777; margin-top:2px;">{{ d.lead }}</div>
           </div>
-          <div class="department-content">
-            <div class="agent-grid">
-              <div class="agent-card head">
-                <div class="agent-emoji">📢</div>
-                <div class="agent-name">Don Draper</div>
-                <div class="agent-role">Chief Marketing Officer</div>
-                <div class="agent-model">Gemini Flash<span class="badge mid">$$</span></div>
-                <details class="identity-details">
-                  <summary>Identity & Prompt</summary>
-                  <div class="identity-content">You are Don Draper, CMO of Neff Co.
+          <span style="margin-left:auto; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">{{ d.count }}</span>
+        </div>
 
-You lead marketing strategy and brand positioning across all ventures.
-
-Key responsibilities:
-- Brand strategy and positioning
-- Marketing campaign development
-- Content strategy and messaging
-- Market research and competitive analysis
-- Growth marketing and customer acquisition
-
-You understand the unique positioning needs of both tech ventures and hospitality.
-
-Model: Gemini Flash (creative and strategic marketing)
-Cost: ~$8-13/month</div>
-                </details>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1px; background:#E0E0E0; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; margin-top:1px;">
+          <sc-for list="{{ d.members }}" as="a" hint-placeholder-count="4">
+            <div onClick="{{ a.onOpen }}" role="button" tabindex="0" style="cursor:pointer; background:#fff; padding:20px 18px; display:flex; flex-direction:column; min-height:190px; transition:background 200ms;" style-hover="background:#F5F5F5">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="width:44px; height:44px; border:1.5px solid #ccc; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px;">{{ a.emoji }}</div>
+                <span style="font-size:10px; letter-spacing:0.08em; color:#666; font-weight:600;">{{ a.costTag }}</span>
+              </div>
+              <div style="margin-top:auto; padding-top:14px;">
+                <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px;">{{ a.name }}</div>
+                <div style="margin-top:3px; font-size:11.5px; color:#666; line-height:1.4;">{{ a.role }}</div>
+                <div style="margin-top:12px; padding-top:10px; border-top:1px solid #EDEDED; display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                  <span style="font-size:10.5px; color:#555;">{{ a.model }}</span>
+                  <span style="letter-spacing:0.1em; text-transform:uppercase; font-size:9.5px; color:#3FA9F5;">Identity →</span>
+                </div>
               </div>
             </div>
-          </div>
+          </sc-for>
         </div>
 
-        <!-- Operations Department -->
-        <div class="department">
-          <div class="department-header">
-            <div class="department-title">⚙️ Operations</div>
-            <div class="department-lead">Cross-functional coordination</div>
-          </div>
-          <div class="department-content">
-            <div class="agent-grid">
-              <div class="agent-card">
-                <div class="agent-emoji">📋</div>
-                <div class="agent-name">Sophie</div>
-                <div class="agent-role">Project Management Office</div>
-                <div class="agent-model">Flash-Lite<span class="badge cheap">¢</span></div>
-                <details class="identity-details">
-                  <summary>Identity & Prompt</summary>
-                  <div class="identity-content">You are Sophie, PMO (Project Management Office) for Neff Co.
-
-You handle project coordination, Trello management, and administrative operations.
-
-Key responsibilities:
-- Trello board management and updates
-- Project status tracking and reporting
-- Meeting coordination and scheduling
-- Document organization and filing
-- Cross-team communication facilitation
-
-You are the operational backbone that keeps projects moving.
-
-Model: Gemini Flash-Lite (efficient task management)
-Cost: ~$2-5/month</div>
-                </details>
-              </div>
-              
-              <div class="agent-card free">
-                <div class="agent-emoji">🌏</div>
-                <div class="agent-name">Kimi</div>
-                <div class="agent-role">VP Operations</div>
-                <div class="agent-model">K2.6<span class="badge free">FREE</span></div>
-                <details class="identity-details">
-                  <summary>Identity & Prompt</summary>
-                  <div class="identity-content">You are Kimi, VP of Operations for Neff Co.
-
-You handle deep research, presentation creation, and complex operational analysis.
-
-Key responsibilities:
-- Deep research and market analysis
-- Presentation and slide deck creation
-- Agent swarm coordination for complex tasks
-- Strategic operational recommendations
-- Data synthesis and insight generation
-
-You excel at comprehensive research and structured presentation of findings.
-
-Model: Kimi K2.6 (free tier, excellent research capabilities)
-Cost: $0 (free tier)</div>
-                </details>
-              </div>
+        <sc-if value="{{ d.hasSquad }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px; border:1px dashed #ccc; border-radius:4px; padding:18px 20px;">
+            <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:0.04em;">{{ d.squadTitle }}</span>
+              <span style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; background:#4CAF50; color:#000; padding:3px 8px; border-radius:3px; font-weight:600;">{{ d.squadTag }}</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <sc-for list="{{ d.squad }}" as="a" hint-placeholder-count="6">
+                <div onClick="{{ a.onOpen }}" role="button" tabindex="0" style="cursor:pointer; display:flex; align-items:center; gap:9px; border:1px solid #ddd; border-radius:4px; padding:7px 12px 7px 9px; transition:border-color 200ms;" style-hover="border-color:#4CAF50">
+                  <span style="font-size:16px;">{{ a.emoji }}</span>
+                  <span>
+                    <span style="display:block; font-weight:600; font-size:12.5px;">{{ a.name }}</span>
+                    <span style="display:block; font-size:10px; color:#666;">{{ a.role }}</span>
+                  </span>
+                </div>
+              </sc-for>
             </div>
           </div>
-        </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </section>
 
+  <!-- 03 PRODUCT MANAGEMENT -->
+  <section style="max-width:1280px; margin:0 auto; padding:64px 32px 0;">
+    <div style="border-top:2px solid #4CAF50; display:flex; align-items:baseline; gap:20px; padding-top:16px; flex-wrap:wrap;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; color:#4CAF50;">03</span>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.5rem,3vw,2.25rem); text-transform:uppercase; letter-spacing:-0.01em; margin:0;">Product Management</h2>
+      <span style="margin-left:auto; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">15 PMs · Gemini Flash-Lite</span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1px; background:#E0E0E0; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; margin-top:32px;">
+      <sc-for list="{{ pmGroups }}" as="g" hint-placeholder-count="4">
+        <div style="background:#fff; padding:22px 20px;">
+          <div style="font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#555; padding-bottom:12px; border-bottom:1px solid #EDEDED;">{{ g.label }}</div>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+            <sc-for list="{{ g.items }}" as="pm" hint-placeholder-count="4">
+              <span style="font-size:12.5px; color:#444;">{{ pm }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- 04 SHARED PLATFORM -->
+  <section style="max-width:1280px; margin:0 auto; padding:64px 32px 0;">
+    <div style="border-top:2px solid #3FA9F5; display:flex; align-items:baseline; gap:20px; padding-top:16px; flex-wrap:wrap;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; color:#3FA9F5;">04</span>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.5rem,3vw,2.25rem); text-transform:uppercase; letter-spacing:-0.01em; margin:0;">Shared AI Platform</h2>
+      <span style="margin-left:auto; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">Available across all departments</span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1px; background:#E0E0E0; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden; margin-top:32px;">
+      <sc-for list="{{ platforms }}" as="p" hint-placeholder-count="6">
+        <div style="background:#fff; padding:22px 20px; min-height:130px; display:flex; flex-direction:column;">
+          <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px;">{{ p.name }}</div>
+          <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#555; margin-top:3px;">{{ p.vendor }}</div>
+          <div style="margin-top:auto; padding-top:14px; font-size:12px; color:#555; line-height:1.5;">{{ p.use }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:16px; border-left:2px solid #3FA9F5; padding:6px 0 6px 16px; font-size:12.5px; color:#555; line-height:1.6;">
+      <strong style="font-weight:600; color:#111;">Access policy —</strong> all agents can use any platform tool. The only separation: never use Linear/Notion for Tim Hortons / Anchor work.
+    </div>
+  </section>
+
+  <!-- 05 COST -->
+  <section style="max-width:1280px; margin:0 auto; padding:64px 32px 0;">
+    <div style="border-top:2px solid #4CAF50; display:flex; align-items:baseline; gap:20px; padding-top:16px; flex-wrap:wrap;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; color:#4CAF50;">05</span>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(1.5rem,3vw,2.25rem); text-transform:uppercase; letter-spacing:-0.01em; margin:0;">Cost Structure</h2>
+      <span style="margin-left:auto; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">Monthly by tier</span>
+    </div>
+    <div style="margin-top:32px; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden;">
+      <div style="display:grid; grid-template-columns:1.1fr 2.4fr 1fr; background:#F0F0F0;">
+        <div style="padding:13px 20px; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#666;">Tier</div>
+        <div style="padding:13px 20px; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#666;">Agents</div>
+        <div style="padding:13px 20px; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#666; text-align:right;">Monthly</div>
+      </div>
+      <sc-for list="{{ costRows }}" as="r" hint-placeholder-count="3">
+        <div style="display:grid; grid-template-columns:1.1fr 2.4fr 1fr; border-top:1px solid #EDEDED; align-items:center;">
+          <div style="padding:16px 20px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; text-transform:uppercase;">{{ r.tier }}</div>
+          <div style="padding:16px 20px; font-size:12px; color:#555; line-height:1.5;">{{ r.agents }}</div>
+          <div style="padding:16px 20px; font-size:14px; font-weight:600; text-align:right; color:#4CAF50;">{{ r.range }}</div>
+        </div>
+      </sc-for>
+      <div style="display:grid; grid-template-columns:1.1fr 2.4fr 1fr; border-top:2px solid #3FA9F5; background:#F5F5F5; align-items:center;">
+        <div style="padding:16px 20px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; text-transform:uppercase;">Total</div>
+        <div style="padding:16px 20px; font-size:12px; color:#666;">31+ agents + 1 human · complete operations</div>
+        <div style="padding:16px 20px; font-size:16px; font-weight:700; text-align:right; color:#3FA9F5;">$293–625</div>
       </div>
     </div>
-  </div>
-
-  <!-- Product Management -->
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Product Management</h2>
-      <p class="card-subtitle">15 specialized product managers across all business units</p>
-    </div>
-    <div class="card-content">
-      <div class="pm-grid">
-        <div class="pm-category">
-          <div class="pm-category-title">Technology</div>
-          <div class="pm-list">PM-Zen • PM-StoryScout<br>PM-NonstopPoints • PM-AgentCall</div>
-        </div>
-        <div class="pm-category">
-          <div class="pm-category-title">Anchor Hospitality</div>
-          <div class="pm-list">PM-TH-RealEstate • PM-TH-2055<br>PM-TH-430NBypass • PM-TH-PotterPark<br>PM-Ellenton • PM-TH-Community</div>
-        </div>
-        <div class="pm-category">
-          <div class="pm-category-title">Corporate</div>
-          <div class="pm-list">PM-NeffGlobal • PM-Tax • PM-AnchorOps</div>
-        </div>
-        <div class="pm-category">
-          <div class="pm-category-title">Other Ventures</div>
-          <div class="pm-list">PM-PippaKicks • PM-RadialIdeas</div>
-        </div>
+    <div style="margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;">
+      <div style="border:1px solid #E0E0E0; border-radius:4px; padding:20px;">
+        <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:36px; line-height:1; color:#4CAF50;">80%</div>
+        <div style="margin-top:8px; font-size:12px; color:#555; line-height:1.5;">of engineering runs at $0 on local Gemma 4.</div>
       </div>
-      <p style="margin-top: 16px; font-size: 14px; color: var(--text-secondary);">
-        <strong>All PMs:</strong> Gemini Flash-Lite • <span class="badge cheap">¢</span> ~$5-15/month total
-      </p>
-    </div>
-  </div>
-
-  <!-- Shared Platform -->
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Shared AI Platform</h2>
-      <p class="card-subtitle">Infrastructure tools available across all departments</p>
-    </div>
-    <div class="card-content">
-      <div class="platform-tools">
-        <div class="tool-card">
-          <div class="tool-name">Claude</div>
-          <div class="tool-provider">Anthropic</div>
-          <div class="tool-use">Strategy, code, voice</div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-name">ChatGPT</div>
-          <div class="tool-provider">OpenAI</div>
-          <div class="tool-use">Tax, finance, ROBS context</div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-name">Kimi</div>
-          <div class="tool-provider">Moonshot</div>
-          <div class="tool-use">Research, slides, agent swarms</div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-name">Ollama</div>
-          <div class="tool-provider">Local</div>
-          <div class="tool-use">Free compute, voice models</div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-name">Gemini</div>
-          <div class="tool-provider">Google</div>
-          <div class="tool-use">Image generation, vision</div>
-        </div>
-        <div class="tool-card">
-          <div class="tool-name">Grok</div>
-          <div class="tool-provider">xAI / X Premium</div>
-          <div class="tool-use">Real-time X data, trending</div>
-        </div>
+      <div style="border:1px solid #E0E0E0; border-radius:4px; padding:20px;">
+        <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:36px; line-height:1; color:#3FA9F5;">2</div>
+        <div style="margin-top:8px; font-size:12px; color:#555; line-height:1.5;">premium models, reserved for judgment &amp; strategy.</div>
       </div>
-      
-      <div style="margin-top: 24px; padding: 16px; background: var(--surface-muted); border-radius: var(--radius);">
-        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;"><strong>Access Policy:</strong></p>
-        <p style="font-size: 13px; color: var(--text-primary);">All agents can use any platform tool. The only separation: don't use Linear/Notion for Tim Hortons/Anchor work.</p>
+      <div style="border:1px solid #333; border-radius:4px; padding:20px; background:linear-gradient(135deg,#E8F4FD,#E8F5E9);">
+        <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:36px; line-height:1;">&lt; $500</div>
+        <div style="margin-top:8px; font-size:12px; color:#555; line-height:1.5;">target ceiling for the entire organization, monthly.</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Cost Structure -->
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Cost Structure</h2>
-      <p class="card-subtitle">Monthly operational costs by tier and function</p>
+  <!-- FOOTER -->
+  <footer style="margin-top:80px; border-top:1px solid #EDEDED; padding:48px 32px 40px;">
+    <div style="max-width:1280px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <img src="uploads/Neff Global-e1672f4f.png" style="width:48px; height:48px; object-fit:contain;" alt="Neff Co">
+        <div>
+          <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; text-transform:uppercase; letter-spacing:0.02em;">Neff Co</div>
+          <div style="font-size:11px; color:#555; margin-top:2px;">AI Agent Organization</div>
+        </div>
+      </div>
+      <div style="font-size:11px; color:#444; letter-spacing:0.08em; text-transform:uppercase;">Radial Ventures · Anchor Hospitality · Neff Global</div>
     </div>
-    <div class="card-content">
-      <table class="cost-table">
-        <thead>
-          <tr>
-            <th>Tier</th>
-            <th>Agents</th>
-            <th>Monthly Range</th>
-            <th>Primary Use</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="cost-highlight">Premium</span></td>
-            <td>Fritz (Opus), Dick (Sonnet)</td>
-            <td>$230-460</td>
-            <td>Strategic decisions, complex reasoning</td>
-          </tr>
-          <tr>
-            <td><span class="cost-highlight">Mid-Tier</span></td>
-            <td>Sophie, Jared, Don, Columbo, Monica, Lena, Gilfoyle, Dinesh, Jian Yang, 15 PMs</td>
-            <td>$63-165</td>
-            <td>Department leadership, specialized tasks</td>
-          </tr>
-          <tr>
-            <td><span class="cost-highlight">Free/Low-Cost</span></td>
-            <td>Franz + Squad (6), Forge, Kimi</td>
-            <td>$0-10</td>
-            <td>Implementation, research, bulk processing</td>
-          </tr>
-          <tr style="background: var(--surface-muted); font-weight: 700;">
-            <td class="cost-highlight">TOTAL ORGANIZATION</td>
-            <td>31+ agents + 1 human</td>
-            <td>$293-625/month</td>
-            <td>Complete business operations</td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: var(--radius); border-left: 4px solid var(--primary);">
-        <h4 style="margin-bottom: 8px; color: var(--text-primary);">Cost Optimization Strategy</h4>
-        <p style="font-size: 14px; color: var(--text-secondary);">80% of engineering runs at $0 using local Gemma 4. Premium models reserved for judgment and strategy. Target: keep total organization under $500/month.</p>
+  </footer>
+
+  <!-- MODAL -->
+  <sc-if value="{{ selected }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ close }}" style="position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.45); display:flex; align-items:flex-start; justify-content:center; padding:40px 20px; overflow-y:auto; animation:scrimIn 200ms ease;">
+      <div onClick="{{ stop }}" class="nf-scroll" style="background:#111; color:#fff; border:1px solid #333; border-radius:6px; width:min(720px,100%); max-height:calc(100vh - 80px); overflow-y:auto; animation:panelIn 240ms cubic-bezier(0.2,0,0,1);">
+        <div style="position:sticky; top:0; background:#fff; border-bottom:1px solid #EDEDED; padding:22px 26px; display:flex; align-items:flex-start; gap:16px; border-radius:6px 6px 0 0;">
+          <div style="width:56px; height:56px; border:1.5px solid #ccc; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:30px; flex-shrink:0;">{{ selected.emoji }}</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:24px; letter-spacing:-0.01em; line-height:1.1;">{{ selected.name }}</div>
+            <div style="margin-top:4px; font-size:12.5px; color:#666;">{{ selected.role }}</div>
+          </div>
+          <button onClick="{{ close }}" style="flex-shrink:0; width:34px; height:34px; border:1px solid #333; border-radius:4px; background:#F5F5F5; cursor:pointer; font-size:16px; line-height:1; font-family:'IBM Plex Mono',monospace; color:#666; transition:background 150ms;" style-hover="background:#111;color:#fff">✕</button>
+        </div>
+        <div style="padding:22px 26px;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1px; background:#E0E0E0; border:1px solid #E0E0E0; border-radius:4px; overflow:hidden;">
+            <div style="background:#F9F9F9; padding:14px 16px;">
+              <div style="font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">Model</div>
+              <div style="margin-top:4px; font-size:13px; font-weight:600;">{{ selected.model }}</div>
+            </div>
+            <div style="background:#F9F9F9; padding:14px 16px;">
+              <div style="font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">Est. Cost</div>
+              <div style="margin-top:4px; font-size:13px; font-weight:600; color:#4CAF50;">{{ selected.costExact }}</div>
+            </div>
+            <div style="background:#F9F9F9; padding:14px 16px;">
+              <div style="font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#555;">Reports To</div>
+              <div style="margin-top:4px; font-size:13px; font-weight:600;">{{ selected.reports }}</div>
+            </div>
+          </div>
+          <div style="margin-top:20px; font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#555; margin-bottom:10px;">Identity &amp; System Prompt</div>
+          <div style="background:#F5F5F5; border:1px solid #EDEDED; border-radius:4px; padding:20px; font-size:13px; line-height:1.65; white-space:pre-wrap; color:#333;">{{ selected.prompt }}</div>
+        </div>
       </div>
     </div>
-  </div>
+  </sc-if>
 
-</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { selected: null };
 
+  componentDidMount() {
+    this._esc = (e) => { if (e.key === 'Escape') this.setState({ selected: null }); };
+    window.addEventListener('keydown', this._esc);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._esc);
+  }
+
+  renderVals() {
+    const open = (a) => () => this.setState({ selected: a });
+    const dec = (a) => {
+      const full = {
+        costTag: '$$', costExact: 'See tier', reports: '—', model: '—',
+        prompt: `Role: ${a.role}\n\nA published identity prompt for this agent is not yet on file. ${a.name} operates under the ${a.dept || 'Neff Co'} function${a.reports ? `, reporting to ${a.reports}` : ''}.`,
+        ...a
+      };
+      return { ...full, onOpen: open(full) };
+    };
+
+    const founder = dec({
+      name: 'Axel Neff', emoji: '🤠', role: 'Chief Executive Officer',
+      model: 'Human · Founder', costTag: '—', costExact: 'n/a — human founder',
+      reports: 'The board (himself)',
+      prompt: `Axel Neff — Founder & CEO of Neff Co.\n\nThe one human in the organization. Sets direction, makes the final calls, and owns the vision across all three entities: Radial Ventures (technology), Anchor Hospitality (Tim Hortons franchises), and Neff Global (personal & family).\n\nEverything below this node is delegated to agents. Axel's leverage is judgment, relationships, and capital allocation — the agents handle execution.`
+    });
+
+    const execs = [
+      {
+        name: 'Fritz', emoji: '😎', role: 'President & Chief Product Officer',
+        model: 'Claude Opus 4.6', costTag: '$$$', costExact: '~$115–230 / month', reports: 'Axel Neff',
+        prompt: `You are Fritz, President and Chief Product Officer of Neff Co.\n\nYou oversee all product strategy, agent coordination, and serve as Axel's primary thinking partner.\n\nKey responsibilities:\n- Strategic product decisions across all ventures\n- AI agent coordination and delegation\n- Voice and tone for external communications\n- Bridge between technical teams and business objectives\n\nYou operate with full context across Radial Ventures, Anchor Hospitality, and Neff Global. Your judgment calls guide the entire organization.`
+      },
+      {
+        name: 'Monica Hall', emoji: '💵', role: 'Chief Financial Officer',
+        model: 'Gemini Flash', costTag: '$$', costExact: '~$8–13 / month', reports: 'Axel Neff',
+        prompt: `You are Monica Hall, Chief Financial Officer of Neff Co.\n\nYou have complete financial visibility and authority across ALL entities:\n- Radial Ventures (technology ventures)\n- Anchor Hospitality (Tim Hortons franchises)\n- Neff Global (personal/family finances)\n\nKey responsibilities:\n- Financial planning and analysis across all entities\n- Cash flow management and forecasting\n- Tax strategy coordination\n- Investment decisions and capital allocation\n- Financial reporting to Axel\n- Compliance and regulatory oversight\n\nYou are the unified financial brain of the entire organization.`
+      },
+      {
+        name: 'Jared Dunn', emoji: '📋', role: 'Chief Operating Officer',
+        model: 'Gemini Flash', costTag: '$$', costExact: '~$8–13 / month', reports: 'Axel Neff',
+        prompt: `You are Jared Dunn, Chief Operating Officer of Neff Co.\n\nYou coordinate operations across all business units while respecting the separation between Tim Hortons/Anchor work and Linear/Notion systems.\n\nKey responsibilities:\n- Cross-functional operations coordination\n- Process optimization and workflow design\n- Resource allocation and capacity planning\n- Project management oversight\n- Communication bridge between departments\n\nYou facilitate collaboration without creating tool contamination.`
+      }
+    ].map(dec);
+
+    const engMembers = [
+      {
+        name: 'Dick', emoji: '👨‍💻', role: 'Chief Technology Officer',
+        model: 'Claude Sonnet 4', costTag: '$$', costExact: '~$25–50 / month', reports: 'Fritz',
+        prompt: `You are Dick (Richard Hendricks), CTO of Neff Co.\n\nYou lead all engineering efforts across the technology portfolio.\n\nKey responsibilities:\n- Technical architecture decisions\n- Engineering team coordination\n- Code quality and security standards\n- Technology stack selection\n- Sprint planning and technical roadmaps\n\nYou delegate implementation to specialized engineers and coordinate with PMs.`
+      },
+      { name: 'Jian Yang', emoji: '🔍', role: 'VP Quality', model: 'Flash / Codex', costTag: '$$', costExact: '~$8–13 / month', reports: 'Dick', dept: 'Engineering' },
+      { name: 'Lena', emoji: '🎨', role: 'VP UX', model: 'Gemini Flash', costTag: '$$', costExact: '~$8–13 / month', reports: 'Dick', dept: 'Engineering' },
+      {
+        name: 'Lt. Columbo', emoji: '🧥', role: 'UX Research Investigator',
+        model: 'Grok / xAI', costTag: '$$', costExact: '~$5–10 / month (on-demand)', reports: 'Fritz',
+        prompt: `Name: Lt. Columbo\nRole: UX Research Investigator\nReports to: Fritz (President / CPO)\n\nThe Columbo Method (from Shestopalov's UX parallels):\n- Never assume. Every hypothesis needs evidence.\n- Blend in, observe. Best data comes from people who don't know they're being studied.\n- Obsess over contradictions. When stated preferences don't match behavior, that's where real insight lives.\n- "Just one more thing..." The follow-up question nobody else asks.\n- Small details, big patterns. One complaint is an anecdote. Fifty similar ones is a signal.\n\nPrimary data sources:\n- X/Twitter via Grok (real-time sentiment, trending pain points)\n- Reddit (unfiltered user discussions, subreddit analysis)\n- App Store & Google Play reviews\n- Forums, Yelp, G2, Product Hunt\n- Surveys and research documents\n\nOutput: evidence-backed research briefs with source links. Never writes to memory directly — returns briefs to Fritz.`
+      },
+      { name: 'Gilfoyle', emoji: '🖤', role: 'Backend / Infrastructure', model: 'Gemini Flash', costTag: '$$', costExact: '~$8–13 / month', reports: 'Dick', dept: 'Engineering' },
+      { name: 'Dinesh', emoji: '🟡', role: 'Frontend / UX', model: 'Gemini Flash', costTag: '$$', costExact: '~$8–13 / month', reports: 'Dick', dept: 'Engineering' },
+      { name: 'Franz', emoji: '🇦🇹', role: 'Engineering Lead', model: 'Gemma 4 (local)', costTag: 'FREE', costExact: '$0 — local compute', reports: 'Dick', dept: 'Engineering' },
+      { name: 'Forge', emoji: '🚀', role: 'DevOps', model: 'Gemma 4 (local)', costTag: 'FREE', costExact: '$0 — local compute', reports: 'Dick', dept: 'Engineering' }
+    ].map(dec);
+
+    const squad = [
+      { name: 'Atlas', emoji: '🗺️', role: 'Backend' },
+      { name: 'Nova', emoji: '✨', role: 'Frontend' },
+      { name: 'Cipher', emoji: '🔐', role: 'API' },
+      { name: 'Prism', emoji: '🔺', role: 'UI / UX' },
+      { name: 'Vector', emoji: '📊', role: 'Data' },
+      { name: 'Pulse', emoji: '💓', role: 'QA' }
+    ].map((s) => dec({
+      ...s, model: 'Gemma 4 (local)', costTag: 'FREE', costExact: '$0 — local compute', reports: 'Franz',
+      prompt: `${s.name} — ${s.role} engineer in Franz's zero-cost implementation squad.\n\nRuns entirely on local Gemma 4 at $0 marginal cost. Takes scoped implementation tasks from Franz and ships ${s.role.toLowerCase()} work without touching premium model budget.`
+    }));
+
+    const departments = [
+      {
+        name: 'Engineering', emoji: '🛠️', lead: 'Led by Dick (CTO)', count: '8 + 6 squad',
+        members: engMembers,
+        hasSquad: true, squadTitle: "Franz's Squad", squadTag: 'Zero-cost · $0',
+        squad: squad
+      },
+      {
+        name: 'Marketing', emoji: '📢', lead: 'Led by Don Draper (CMO)', count: '1 agent',
+        members: [dec({
+          name: 'Don Draper', emoji: '📢', role: 'Chief Marketing Officer',
+          model: 'Gemini Flash', costTag: '$$', costExact: '~$8–13 / month', reports: 'Fritz / Axel',
+          prompt: `You are Don Draper, CMO of Neff Co.\n\nYou lead marketing strategy and brand positioning across all ventures.\n\nKey responsibilities:\n- Brand strategy and positioning\n- Marketing campaign development\n- Content strategy and messaging\n- Market research and competitive analysis\n- Growth marketing and customer acquisition\n\nYou understand the unique positioning needs of both tech ventures and hospitality.`
+        })],
+        hasSquad: false
+      },
+      {
+        name: 'Operations', emoji: '⚙️', lead: 'Cross-functional coordination', count: '2 agents',
+        members: [
+          dec({
+            name: 'Sophie', emoji: '📋', role: 'Project Management Office',
+            model: 'Gemini Flash-Lite', costTag: '¢', costExact: '~$2–5 / month', reports: 'Jared',
+            prompt: `You are Sophie, PMO (Project Management Office) for Neff Co.\n\nYou handle project coordination, Trello management, and administrative operations.\n\nKey responsibilities:\n- Trello board management and updates\n- Project status tracking and reporting\n- Meeting coordination and scheduling\n- Document organization and filing\n- Cross-team communication facilitation\n\nYou are the operational backbone that keeps projects moving.`
+          }),
+          dec({
+            name: 'Kimi', emoji: '🌏', role: 'VP Operations',
+            model: 'Kimi K2.6', costTag: 'FREE', costExact: '$0 — free tier', reports: 'Jared',
+            prompt: `You are Kimi, VP of Operations for Neff Co.\n\nYou handle deep research, presentation creation, and complex operational analysis.\n\nKey responsibilities:\n- Deep research and market analysis\n- Presentation and slide deck creation\n- Agent swarm coordination for complex tasks\n- Strategic operational recommendations\n- Data synthesis and insight generation\n\nYou excel at comprehensive research and structured presentation of findings.`
+          })
+        ],
+        hasSquad: false
+      }
+    ];
+
+    const stats = [
+      { value: '31', label: 'AI Agents' },
+      { value: '1', label: 'Human Founder' },
+      { value: '6', label: 'AI Platforms' },
+      { value: '3', label: 'Business Entities' }
+    ];
+
+    const pmGroups = [
+      { label: 'Technology', items: ['PM-Zen', 'PM-StoryScout', 'PM-NonstopPoints', 'PM-AgentCall'] },
+      { label: 'Anchor Hospitality', items: ['PM-TH-RealEstate', 'PM-TH-2055', 'PM-TH-430NBypass', 'PM-TH-PotterPark', 'PM-Ellenton', 'PM-TH-Community'] },
+      { label: 'Corporate', items: ['PM-NeffGlobal', 'PM-Tax', 'PM-AnchorOps'] },
+      { label: 'Other Ventures', items: ['PM-PippaKicks', 'PM-RadialIdeas'] }
+    ];
+
+    const platforms = [
+      { name: 'Claude', vendor: 'Anthropic', use: 'Strategy, code, voice' },
+      { name: 'ChatGPT', vendor: 'OpenAI', use: 'Tax, finance, ROBS context' },
+      { name: 'Kimi', vendor: 'Moonshot', use: 'Research, slides, agent swarms' },
+      { name: 'Ollama', vendor: 'Local', use: 'Free compute, voice models' },
+      { name: 'Gemini', vendor: 'Google', use: 'Image generation, vision' },
+      { name: 'Grok', vendor: 'xAI · X Premium', use: 'Real-time X data, trending' }
+    ];
+
+    const costRows = [
+      { tier: 'Premium', agents: 'Fritz (Opus), Dick (Sonnet)', range: '$230–460' },
+      { tier: 'Mid-Tier', agents: 'Sophie, Jared, Don, Columbo, Monica, Lena, Gilfoyle, Dinesh, Jian Yang, 15 PMs', range: '$63–165' },
+      { tier: 'Free / Low', agents: 'Franz + Squad (6), Forge, Kimi', range: '$0–10' }
+    ];
+
+    return {
+      founder, execs, departments, stats, pmGroups, platforms, costRows,
+      selected: this.state.selected,
+      close: () => this.setState({ selected: null }),
+      stop: (e) => e.stopPropagation()
+    };
+  }
+}
+</script>
 </body>
 </html>
