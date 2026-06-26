@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neff Co. Digital Brain</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #020810; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif; color: #fff; }
+#canvas3d { width: 100%; height: 100%; display: block; }
+
+/* HUD overlay */
+#hud { position: absolute; top: 0; left: 0; right: 0; padding: 24px; z-index: 10; pointer-events: none; }
+#hud h1 { font-size: 13px; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; color: rgba(100, 220, 255, 0.7); }
+#hud .stats { font-size: 10px; color: rgba(100, 200, 255, 0.3); letter-spacing: 1.5px; margin-top: 4px; }
+
+/* Tooltip */
+#tooltip { position: absolute; padding: 8px 14px; background: rgba(5, 15, 35, 0.92); border: 1px solid rgba(100, 200, 255, 0.25); border-radius: 6px; font-size: 11px; color: rgba(100, 220, 255, 0.9); pointer-events: none; z-index: 20; display: none; backdrop-filter: blur(8px); white-space: nowrap; letter-spacing: 0.5px; }
+#tooltip .type { font-size: 8px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; display: block; margin-top: 2px; }
+
+/* Detail panel */
+#detail { position: absolute; bottom: 24px; left: 24px; max-width: 340px; padding: 18px 22px; background: rgba(5, 15, 35, 0.9); border: 1px solid rgba(100, 200, 255, 0.12); border-radius: 10px; z-index: 10; display: none; backdrop-filter: blur(16px); }
+#detail h2 { font-size: 14px; font-weight: 500; color: rgba(100, 220, 255, 0.95); margin-bottom: 4px; letter-spacing: 0.5px; }
+#detail .badge { display: inline-block; font-size: 8px; letter-spacing: 2px; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; margin-bottom: 10px; }
+#detail .links { font-size: 11px; color: rgba(100, 200, 255, 0.5); line-height: 1.8; }
+#detail .links a { color: rgba(100, 200, 255, 0.75); cursor: pointer; text-decoration: none; }
+#detail .links a:hover { color: #fff; text-decoration: underline; }
+#detail .meta { font-size: 9px; margin-top: 10px; color: rgba(100, 200, 255, 0.25); letter-spacing: 0.5px; }
+
+/* Legend */
+#legend { position: absolute; top: 24px; right: 24px; z-index: 10; pointer-events: none; }
+#legend div { font-size: 9px; color: rgba(100, 200, 255, 0.35); margin-bottom: 5px; display: flex; align-items: center; gap: 7px; letter-spacing: 1px; }
+#legend .dot { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 6px currentColor; }
+
+/* Scan line effect */
+#scanline { position: absolute; inset: 0; pointer-events: none; z-index: 5; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(100,200,255,0.008) 2px, rgba(100,200,255,0.008) 4px); }
+
+/* Loading */
+#loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #020810; z-index: 100; transition: opacity 1s; }
+#loading .ring { width: 40px; height: 40px; border: 1px solid rgba(100,200,255,0.15); border-top-color: rgba(100,200,255,0.6); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
+#loading .text { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: rgba(100, 200, 255, 0.4); }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div id="loading"><div class="ring"></div><div class="text">Mapping Neural Network...</div></div>
+<div id="scanline"></div>
+<canvas id="canvas3d"></canvas>
+<div id="hud">
+  <h1>Neff Co. Digital Brain</h1>
+  <div class="stats" id="stats"></div>
+</div>
+<div id="legend">
+  <div><span class="dot" style="color: #00d4ff;"></span> Project</div>
+  <div><span class="dot" style="color: #ff6b9d;"></span> Person</div>
+  <div><span class="dot" style="color: #ffd93d;"></span> Agent</div>
+  <div><span class="dot" style="color: #6bff8a;"></span> Decision</div>
+  <div><span class="dot" style="color: #c4b5fd;"></span> Reference</div>
+</div>
+<div id="tooltip"><span id="tt-label"></span><span class="type" id="tt-type"></span></div>
+<div id="detail">
+  <h2 id="d-title"></h2>
+  <div class="badge" id="d-badge"></div>
+  <div class="links" id="d-links"></div>
+  <div class="meta" id="d-meta"></div>
+</div>
+
+<script>
+// ─── GRAPH DATA ───
+const G = {
+  "nodes": [
+    {
+      "id": "franz",
+      "label": "Franz",
+      "type": "agent",
+      "status": "",
+      "updated": "2026-06-26",
+      "connections": 3,
+      "path": "agents/franz.md"
+    },
+    {
+      "id": "fritz",
+      "label": "Fritz",
+      "type": "agent",
+      "status": "",
+      "updated": "2026-06-26",
+      "connections": 3,
+      "path": "agents/fritz.md"
+    },
+    {
+      "id": "sophie",
+      "label": "Sophie",
+      "type": "agent",
+      "status": "",
+      "updated": "2026-06-26",
+      "connections": 2,
+      "path": "agents/sophie.md"
+    },
+    {
+      "id": "2026-Q2",
+      "label": "Q2 2026 Decisions",
+      "type": "decisions",
+      "status": "",
+      "updated": "2026-06-26",
+      "connections": 3,
+      "path": "decisions/2026-Q2.md"
+    },
+    {
+      "id": "axel-neff",
+      "label": "Axel Neff",
+      "type": "person",
+      "status": "",
+      "updated": "2026-06-26",
+      "connections": 4,
+      "path": "people/axel-neff.md"
+    },
+    {
+      "id": "kennedy-family",
+      "label": "Kennedy Family",
+      "type": "person",
+      "status": "",
+      "updated": "2026-06-26",
+      "connections": 2,
+      "path": "people/kennedy-family.md"
+    },
+    {
+      "id": "colosseum-trip",
+      "label": "Italy Trip \u2014 Colosseum",
+      "type": "project",
+      "status": "active",
+      "updated": "2026-06-26",
+      "connections": 2,
+      "path": "projects/colosseum-trip/INDEX.md"
+    },
+    {
+      "id": "linkedin-engine",
+      "label": "LinkedIn Content Engine",
+      "type": "project",
+      "status": "active",
+      "updated": "2026-06-26",
+      "connections": 3,
+      "path": "projects/linkedin-engine/INDEX.md"
+    },
+    {
+      "id": "radial",
+      "label": "Radial Ventures",
+      "type": "project",
+      "status": "active",
+      "updated": "2026-06-26",
+      "connections": 6,
+      "path": "projects/radial/INDEX.md"
+    },
+    {
+      "id": "storyscout",
+      "label": "StoryScout \u2014 Bills Content",
+      "type": "project",
+      "status": "broken",
+      "updated": "2026-06-26",
+      "connections": 1,
+      "path": "projects/storyscout/INDEX.md"
+    },
+    {
+      "id": "tim-hortons",
+      "label": "Tim Hortons Florida",
+      "type": "project",
+      "status": "active",
+      "updated": "2026-06-26",
+      "connections": 4,
+      "path": "projects/tim-hortons/INDEX.md"
+    },
+    {
+      "id": "zen-net",
+      "label": "zen.net",
+      "type": "project",
+      "status": "active",
+      "updated": "2026-06-26",
+      "connections": 3,
+      "path": "projects/zen-net/INDEX.md"
+    },
+    {
+      "id": "clearview",
+      "label": "Clearview POS",
+      "type": "reference",
+      "status": "",
+      "updated": "2026-06-26",
+      "connections": 1,
+      "path": "reference/clearview.md"
+    }
+  ],
+  "edges": [
+    {
+      "source": "franz",
+      "target": "zen-net"
+    },
+    {
+      "source": "franz",
+      "target": "fritz"
+    },
+    {
+      "source": "franz",
+      "target": "radial"
+    },
+    {
+      "source": "fritz",
+      "target": "axel-neff"
+    },
+    {
+      "source": "fritz",
+      "target": "sophie"
+    },
+    {
+      "source": "sophie",
+      "target": "axel-neff"
+    },
+    {
+      "source": "2026-Q2",
+      "target": "fritz"
+    },
+    {
+      "source": "2026-Q2",
+      "target": "axel-neff"
+    },
+    {
+      "source": "2026-Q2",
+      "target": "franz"
+    },
+    {
+      "source": "axel-neff",
+      "target": "linkedin-engine"
+    },
+    {
+      "source": "axel-neff",
+      "target": "colosseum-trip"
+    },
+    {
+      "source": "axel-neff",
+      "target": "tim-hortons"
+    },
+    {
+      "source": "axel-neff",
+      "target": "radial"
+    },
+    {
+      "source": "kennedy-family",
+      "target": "axel-neff"
+    },
+    {
+      "source": "kennedy-family",
+      "target": "colosseum-trip"
+    },
+    {
+      "source": "linkedin-engine",
+      "target": "tim-hortons"
+    },
+    {
+      "source": "linkedin-engine",
+      "target": "radial"
+    },
+    {
+      "source": "radial",
+      "target": "zen-net"
+    },
+    {
+      "source": "radial",
+      "target": "43north"
+    },
+    {
+      "source": "radial",
+      "target": "tim-hortons"
+    },
+    {
+      "source": "storyscout",
+      "target": "axel-neff"
+    },
+    {
+      "source": "tim-hortons",
+      "target": "clearview"
+    },
+    {
+      "source": "tim-hortons",
+      "target": "qsr-brand"
+    },
+    {
+      "source": "zen-net",
+      "target": "axel-neff"
+    }
+  ],
+  "nodeCount": 13,
+  "edgeCount": 24
+};
+
+// ─── COLORS ───
+const COLORS = {
+  project:   [0, 212, 255],
+  person:    [255, 107, 157],
+  agent:     [255, 217, 61],
+  decisions: [107, 255, 138],
+  reference: [196, 181, 253],
+  default:   [68, 136, 204],
+};
+
+// ─── FORCE LAYOUT ───
+const nodes = G.nodes.map((n, i) => ({
+  ...n, i,
+  x: (Math.random() - 0.5) * 100,
+  y: (Math.random() - 0.5) * 100,
+  z: (Math.random() - 0.5) * 100,
+  vx: 0, vy: 0, vz: 0,
+  color: COLORS[n.type] || COLORS.default,
+  size: 4 + Math.min((n.connections || 1), 8) * 1.5,
+}));
+const nodeMap = {};
+nodes.forEach(n => nodeMap[n.id] = n);
+
+function simulate(alpha) {
+  const K = 60, SL = 40, SK = 0.03, D = 0.82, CP = 0.012;
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i], b = nodes[j];
+      let dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
+      let d = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
+      let f = K * K / d * alpha;
+      a.vx += dx/d*f; a.vy += dy/d*f; a.vz += dz/d*f;
+      b.vx -= dx/d*f; b.vy -= dy/d*f; b.vz -= dz/d*f;
+    }
+  }
+  for (const e of G.edges) {
+    const a = nodeMap[e.source], b = nodeMap[e.target];
+    if (!a || !b) continue;
+    let dx = b.x-a.x, dy = b.y-a.y, dz = b.z-a.z;
+    let d = Math.sqrt(dx*dx+dy*dy+dz*dz)||1;
+    let f = (d-SL)*SK*alpha;
+    a.vx += dx/d*f; a.vy += dy/d*f; a.vz += dz/d*f;
+    b.vx -= dx/d*f; b.vy -= dy/d*f; b.vz -= dz/d*f;
+  }
+  for (const n of nodes) {
+    n.vx -= n.x*CP; n.vy -= n.y*CP; n.vz -= n.z*CP;
+    n.vx *= D; n.vy *= D; n.vz *= D;
+    n.x += n.vx; n.y += n.vy; n.z += n.vz;
+  }
+}
+for (let i = 0; i < 300; i++) simulate(0.4 * Math.max(0.01, 1 - i/300));
+
+// ─── CANVAS 3D RENDERER ───
+const canvas = document.getElementById('canvas3d');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+// Camera
+let camTheta = 0, camPhi = 0.25, camDist = 500;
+let autoRotate = true, dragging = false, lastMx = 0, lastMy = 0;
+
+canvas.addEventListener('mousedown', e => { dragging = true; autoRotate = false; lastMx = e.clientX; lastMy = e.clientY; });
+canvas.addEventListener('mouseup', () => dragging = false);
+canvas.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  if (!dragging) return;
+  camTheta -= (e.clientX - lastMx) * 0.005;
+  camPhi = Math.max(-1.2, Math.min(1.2, camPhi + (e.clientY - lastMy) * 0.005));
+  lastMx = e.clientX; lastMy = e.clientY;
+});
+canvas.addEventListener('wheel', e => { camDist = Math.max(150, Math.min(900, camDist + e.deltaY * 0.5)); e.preventDefault(); }, {passive:false});
+
+let mouseX = -999, mouseY = -999;
+
+function normalize(v) {
+  const l = Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]) || 1;
+  return [v[0]/l, v[1]/l, v[2]/l];
+}
+function cross(a, b) { return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+function dot(a, b) { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+
+function project(x, y, z) {
+  // Camera orbits the origin
+  const eye = [
+    camDist * Math.cos(camPhi) * Math.sin(camTheta),
+    camDist * Math.sin(camPhi),
+    camDist * Math.cos(camPhi) * Math.cos(camTheta)
+  ];
+  // Look-at matrix (target = origin)
+  const fwd = normalize([-eye[0], -eye[1], -eye[2]]);
+  const right = normalize(cross(fwd, [0, 1, 0]));
+  const up = cross(right, fwd);
+  // Transform world point to camera space
+  const d = [x - eye[0], y - eye[1], z - eye[2]];
+  const cX = dot(right, d);
+  const cY = dot(up, d);
+  const cZ = dot(fwd, d);
+  if (cZ < 5) return null; // behind camera
+  // Perspective projection (FOV ~60 degrees)
+  const f = W * 0.8;
+  return {
+    x: W/2 + cX * f / cZ,
+    y: H/2 - cY * f / cZ,
+    z: cZ,
+    scale: f / cZ
+  };
+}
+
+// Dust particles
+const dustCount = 1500;
+const dustParts = [];
+for (let i = 0; i < dustCount; i++) {
+  dustParts.push({
+    x: (Math.random()-0.5)*700,
+    y: (Math.random()-0.5)*700,
+    z: (Math.random()-0.5)*700,
+    size: Math.random() * 1.2 + 0.3,
+    alpha: Math.random() * 0.15 + 0.03,
+  });
+}
+
+// Pulse particles along edges
+const pulses = [];
+for (const e of G.edges) {
+  const a = nodeMap[e.source], b = nodeMap[e.target];
+  if (!a || !b) continue;
+  for (let k = 0; k < 2; k++) {
+    pulses.push({ source: e.source, target: e.target, t: Math.random(), speed: 0.002 + Math.random() * 0.003, dir: k === 0 ? 1 : -1 });
+  }
+}
+
+let hoveredId = null;
+let selectedId = null;
+let time = 0;
+
+function frame() {
+  requestAnimationFrame(frame);
+  time += 0.016;
+
+  // Soft sim
+  simulate(0.02);
+
+  if (autoRotate) camTheta += 0.0015;
+
+  ctx.fillStyle = '#020810';
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle radial gradient center glow
+  const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W*0.5);
+  grad.addColorStop(0, 'rgba(10, 40, 80, 0.15)');
+  grad.addColorStop(1, 'rgba(2, 8, 16, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw dust
+  for (const d of dustParts) {
+    const rx = d.x * Math.cos(time*0.03) - d.z * Math.sin(time*0.03);
+    const rz = d.x * Math.sin(time*0.03) + d.z * Math.cos(time*0.03);
+    const p = project(rx, d.y, rz);
+    if (!p) continue;
+    ctx.fillStyle = `rgba(60, 130, 200, ${d.alpha})`;
+    ctx.fillRect(p.x, p.y, d.size, d.size);
+  }
+
+  // Project all nodes
+  const projected = nodes.map(n => {
+    const p = project(n.x, n.y, n.z);
+    return { node: n, p };
+  }).filter(e => e.p).sort((a, b) => b.p.z - a.p.z);
+
+  // Draw edges
+  for (const e of G.edges) {
+    const a = nodeMap[e.source], b = nodeMap[e.target];
+    if (!a || !b) continue;
+    const pa = project(a.x, a.y, a.z), pb = project(b.x, b.y, b.z);
+    if (!pa || !pb) continue;
+
+    const isHovered = hoveredId && (e.source === hoveredId || e.target === hoveredId);
+    const isSelected = selectedId && (e.source === selectedId || e.target === selectedId);
+    const highlight = isHovered || isSelected;
+
+    const color = highlight ? a.color : [60, 140, 220];
+    const alpha = highlight ? 0.8 : 0.35;
+
+    ctx.beginPath();
+    ctx.moveTo(pa.x, pa.y);
+    ctx.lineTo(pb.x, pb.y);
+    ctx.strokeStyle = `rgba(${color[0]},${color[1]},${color[2]},${alpha})`;
+    ctx.lineWidth = highlight ? 2 : 1;
+    ctx.stroke();
+
+    // Edge glow for highlighted
+    // Edge glow (always, stronger when highlighted)
+    ctx.beginPath();
+    ctx.moveTo(pa.x, pa.y);
+    ctx.lineTo(pb.x, pb.y);
+    ctx.strokeStyle = `rgba(${color[0]},${color[1]},${color[2]},${highlight ? 0.2 : 0.06})`;
+    ctx.lineWidth = highlight ? 6 : 3;
+    ctx.stroke();
+  }
+
+  // Draw pulses
+  for (const pulse of pulses) {
+    const a = nodeMap[pulse.source], b = nodeMap[pulse.target];
+    if (!a || !b) continue;
+    pulse.t += pulse.speed * pulse.dir;
+    if (pulse.t > 1) pulse.t = 0;
+    if (pulse.t < 0) pulse.t = 1;
+    const px = a.x + (b.x - a.x) * pulse.t;
+    const py = a.y + (b.y - a.y) * pulse.t;
+    const pz = a.z + (b.z - a.z) * pulse.t;
+    const pp = project(px, py, pz);
+    if (!pp) continue;
+
+    const isConnected = hoveredId && (pulse.source === hoveredId || pulse.target === hoveredId);
+    const alpha = isConnected ? 0.9 : 0.45;
+    const size = (isConnected ? 3 : 2) * Math.max(0.4, 120 / pp.z);
+
+    ctx.beginPath();
+    ctx.arc(pp.x, pp.y, size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(100, 200, 255, ${alpha})`;
+    ctx.fill();
+  }
+
+  // Draw nodes (back to front)
+  let newHover = null;
+  for (const { node, p } of projected) {
+    const c = node.color;
+    const isHovered = node.id === hoveredId;
+    const isSelected = node.id === selectedId;
+    const highlight = isHovered || isSelected;
+    const baseSize = node.size * Math.max(0.5, 130 / p.z);
+    const size = highlight ? baseSize * 1.4 : baseSize;
+    const pulse = Math.sin(time * 2 + node.i * 1.3) * 0.15 + 1;
+
+    // Outer glow
+    const glowSize = size * 3 * pulse;
+    const glowGrad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowSize);
+    glowGrad.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${highlight ? 0.2 : 0.08})`);
+    glowGrad.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, glowSize, 0, Math.PI * 2);
+    ctx.fillStyle = glowGrad;
+    ctx.fill();
+
+    // Core
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+    const coreGrad = ctx.createRadialGradient(p.x - size*0.3, p.y - size*0.3, 0, p.x, p.y, size);
+    coreGrad.addColorStop(0, `rgba(${Math.min(255,c[0]+80)},${Math.min(255,c[1]+80)},${Math.min(255,c[2]+80)},1)`);
+    coreGrad.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0.9)`);
+    ctx.fillStyle = coreGrad;
+    ctx.fill();
+
+    // Label
+    const labelAlpha = highlight ? 0.95 : Math.max(0.35, 120 / p.z);
+    const fontSize = Math.max(9, Math.min(14, 1400 / p.z));
+    if (labelAlpha > 0.05) {
+      ctx.font = `${highlight ? 600 : 300} ${fontSize}px -apple-system, system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${labelAlpha})`;
+      ctx.fillText(node.label, p.x, p.y + size + fontSize + 2);
+    }
+
+    // Hit test
+    const dx = mouseX - p.x, dy = mouseY - p.y;
+    if (dx*dx + dy*dy < (size + 8) * (size + 8)) {
+      newHover = node.id;
+    }
+  }
+
+  // Update hover
+  if (newHover !== hoveredId) {
+    hoveredId = newHover;
+    canvas.style.cursor = hoveredId ? 'pointer' : 'default';
+    if (hoveredId) {
+      const n = nodeMap[hoveredId];
+      document.getElementById('tt-label').textContent = n.label;
+      document.getElementById('tt-type').textContent = n.type;
+      document.getElementById('tooltip').style.display = 'block';
+    } else {
+      document.getElementById('tooltip').style.display = 'none';
+    }
+  }
+  if (hoveredId) {
+    const tt = document.getElementById('tooltip');
+    tt.style.left = (mouseX + 16) + 'px';
+    tt.style.top = (mouseY - 10) + 'px';
+  }
+}
+
+// Click handler
+canvas.addEventListener('click', () => {
+  if (hoveredId) {
+    selectedId = hoveredId;
+    const n = nodeMap[selectedId];
+    document.getElementById('d-title').textContent = n.label;
+    const badge = document.getElementById('d-badge');
+    badge.textContent = n.type;
+    badge.style.background = `rgba(${n.color.join(',')},0.15)`;
+    badge.style.color = `rgb(${n.color.join(',')})`;
+
+    const connected = G.edges
+      .filter(e => e.source === n.id || e.target === n.id)
+      .map(e => e.source === n.id ? e.target : e.source);
+    document.getElementById('d-links').innerHTML = connected.length
+      ? 'Connected to: ' + connected.map(id => {
+          const cn = nodeMap[id];
+          return cn ? `<a onclick="window.selectNode('${id}')">${cn.label}</a>` : id;
+        }).join(' · ')
+      : 'No connections';
+    document.getElementById('d-meta').textContent = [n.status && `Status: ${n.status}`, n.updated && `Updated: ${n.updated}`, n.path && `Path: ${n.path}`].filter(Boolean).join(' · ');
+    document.getElementById('detail').style.display = 'block';
+  } else {
+    selectedId = null;
+    document.getElementById('detail').style.display = 'none';
+  }
+});
+
+window.selectNode = (id) => {
+  selectedId = id;
+  const n = nodeMap[id];
+  if (!n) return;
+  document.getElementById('d-title').textContent = n.label;
+  const badge = document.getElementById('d-badge');
+  badge.textContent = n.type;
+  badge.style.background = `rgba(${n.color.join(',')},0.15)`;
+  badge.style.color = `rgb(${n.color.join(',')})`;
+  const connected = G.edges.filter(e => e.source === n.id || e.target === n.id).map(e => e.source === n.id ? e.target : e.source);
+  document.getElementById('d-links').innerHTML = connected.length ? 'Connected to: ' + connected.map(id => { const cn = nodeMap[id]; return cn ? `<a onclick="window.selectNode('${id}')">${cn.label}</a>` : id; }).join(' · ') : 'No connections';
+  document.getElementById('d-meta').textContent = [n.status && `Status: ${n.status}`, n.updated && `Updated: ${n.updated}`].filter(Boolean).join(' · ');
+};
+
+// Stats
+document.getElementById('stats').textContent = `${G.nodes.length} nodes · ${G.edges.length} connections · ${G.nodes.filter(n=>n.status==='active').length} active · ${new Date().toISOString().split('T')[0]}`;
+
+// Boot
+setTimeout(() => {
+  const l = document.getElementById('loading');
+  l.style.opacity = '0';
+  setTimeout(() => l.style.display = 'none', 1000);
+}, 2000);
+
+frame();
+</script>
+</body>
+</html>
